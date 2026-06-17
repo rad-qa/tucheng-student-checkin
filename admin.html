@@ -4,14 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>土城醫院醫事放射 - 實習管理系統</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
   :root{
+    --font-main:"Microsoft JhengHei","PingFang TC","Heiti TC","Noto Sans TC",sans-serif;
     --bg:#F7F4ED;
     --bg-card:#FFFFFF;
     --bg-soft:#EFEBE1;
@@ -40,12 +38,12 @@
   body{
     background:var(--bg);
     color:var(--ink);
-    font-family:'Noto Sans TC',sans-serif;
+    font-family:var(--font-main);
     font-size:16px;
     line-height:1.6;
   }
-  h1,h2,h3{font-family:'Noto Serif TC',serif;font-weight:700;margin:0;}
-  button, input, select, textarea{font-family:'Noto Sans TC',sans-serif;font-size:15px;}
+  h1,h2,h3{font-family:var(--font-main);font-weight:700;margin:0;}
+  button, input, select, textarea{font-family:var(--font-main);font-size:15px;}
   input, select, textarea{
     border:1px solid var(--border);
     border-radius:var(--radius-sm);
@@ -191,7 +189,7 @@
   .metric-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:22px;}
   .metric-card{background:var(--bg-soft);border-radius:var(--radius-md);padding:16px 18px;}
   .metric-card .lbl{font-size:13px;color:var(--ink-soft);margin:0 0 4px;}
-  .metric-card .val{font-size:26px;font-weight:700;margin:0;font-family:'Noto Serif TC',serif;}
+  .metric-card .val{font-size:26px;font-weight:700;margin:0;font-family:var(--font-main);}
   .metric-card .val.warn{color:var(--amber-600);}
 
   table{width:100%;border-collapse:collapse;font-size:14.5px;}
@@ -290,7 +288,6 @@
       <a class="nav-item" data-page="leaves"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>請假管理</a>
       <a class="nav-item" data-page="students"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>學生</a>
       <a class="nav-item" data-page="teachers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>老師 / QR Code</a>
-      <a class="nav-item" data-page="stations"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>站別</a>
       <a class="nav-item" data-page="schedule"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>排程表</a>
       <a class="nav-item" data-page="reports"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>報表匯出</a>
       <a class="nav-item" data-page="sync"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>資料同步</a>
@@ -416,38 +413,6 @@
             </table>
           </div>
           <div class="empty-state" id="teachersEmpty" style="display:none;">尚未建立任何老師資料</div>
-        </div>
-      </section>
-
-      <!-- ========== STATIONS ========== -->
-      <section class="page" id="page-stations">
-        <h2 class="page-title">站別管理</h2>
-        <p class="page-sub">維護所有實習站別清單</p>
-
-        <div class="card">
-          <div class="toolbar">
-            <button class="btn" id="downloadStationTemplateBtn">
-              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              下載 CSV 範本
-            </button>
-            <button class="btn" id="importStationBtn">
-              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              匯入 CSV
-            </button>
-            <input type="file" id="stationFileInput" accept=".csv" style="display:none;">
-            <div class="spacer"></div>
-            <button class="btn btn-primary" id="addStationBtn">
-              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              新增站別
-            </button>
-          </div>
-          <div class="table-wrap">
-            <table id="stationsTable">
-              <thead><tr><th>站別名稱</th><th></th></tr></thead>
-              <tbody></tbody>
-            </table>
-          </div>
-          <div class="empty-state" id="stationsEmpty" style="display:none;">尚未建立任何站別</div>
         </div>
       </section>
 
@@ -690,6 +655,17 @@
 
 <div class="toast" id="toast"></div>
 
+<div class="modal-overlay" id="formModalOverlay">
+  <div class="modal-box">
+    <h3 id="formModalTitle">標題</h3>
+    <div id="formModalBody"></div>
+    <div class="toolbar" style="margin-top:20px; justify-content:flex-end;">
+      <button class="btn" id="formModalCancelBtn">取消</button>
+      <button class="btn btn-primary" id="formModalSaveBtn">儲存</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ============ Core: storage, auth, navigation ============ */
 (function(){
@@ -834,6 +810,66 @@
     window.scrollTo(0,0);
   };
 
+  /* ---------- Generic form modal ---------- */
+  var formModalOverlay = document.getElementById('formModalOverlay');
+  var formModalBody = document.getElementById('formModalBody');
+  var formModalSaveBtn = document.getElementById('formModalSaveBtn');
+  var formModalCancelBtn = document.getElementById('formModalCancelBtn');
+  var currentModalSaveHandler = null;
+
+  function buildFieldHtml(f){
+    var val = (f.value === undefined || f.value === null) ? '' : f.value;
+    if(f.type === 'select'){
+      var opts = (f.options || []).map(function(o){
+        var sel = (String(o.value) === String(val)) ? ' selected' : '';
+        return '<option value="' + String(o.value).replace(/"/g,'&quot;') + '"' + sel + '>' + o.label + '</option>';
+      }).join('');
+      return '<select class="modalField" data-key="' + f.key + '">' + opts + '</select>';
+    }
+    if(f.type === 'textarea'){
+      return '<textarea class="modalField" data-key="' + f.key + '" rows="3">' + val + '</textarea>';
+    }
+    var inputType = f.type || 'text';
+    return '<input class="modalField" data-key="' + f.key + '" type="' + inputType + '" value="' +
+      String(val).replace(/"/g,'&quot;') + '" placeholder="' + (f.placeholder || '') + '">';
+  }
+
+  window.APP.openFormModal = function(opts){
+    document.getElementById('formModalTitle').textContent = opts.title;
+    formModalBody.innerHTML = opts.fields.map(function(f){
+      return '<div class="form-field" style="margin-bottom:14px;"><label>' + f.label +
+        (f.required ? ' <span style="color:var(--red-600);">*</span>' : '') +
+        '</label>' + buildFieldHtml(f) + '</div>';
+    }).join('');
+    formModalOverlay.classList.add('active');
+
+    currentModalSaveHandler = function(){
+      var values = {};
+      formModalBody.querySelectorAll('.modalField').forEach(function(el){
+        values[el.getAttribute('data-key')] = el.value;
+      });
+      for(var i=0;i<opts.fields.length;i++){
+        var f = opts.fields[i];
+        if(f.required && !String(values[f.key] || '').trim()){
+          alert(f.label + ' 為必填欄位');
+          return;
+        }
+      }
+      formModalOverlay.classList.remove('active');
+      opts.onSave(values);
+    };
+  };
+
+  formModalSaveBtn.addEventListener('click', function(){
+    if(currentModalSaveHandler) currentModalSaveHandler();
+  });
+  formModalCancelBtn.addEventListener('click', function(){
+    formModalOverlay.classList.remove('active');
+  });
+  formModalOverlay.addEventListener('click', function(e){
+    if(e.target === formModalOverlay) formModalOverlay.classList.remove('active');
+  });
+
 })();
 </script>
 <script>
@@ -919,21 +955,24 @@
 
   function openStudentModal(id){
     var s = id ? window.APP.data.students.find(function(x){ return x.id === id; }) : null;
-    var name = prompt('姓名', s ? s.name : '');
-    if(name === null) return;
-    if(!name.trim()){ alert('姓名不可空白'); return; }
-    var studentNo = prompt('學號', s ? s.studentNo : '');
-    if(studentNo === null) return;
-    var school = prompt('學校', s ? s.school : '');
-    if(school === null) return;
-    if(s){
-      s.name = name.trim(); s.studentNo = studentNo.trim(); s.school = school.trim();
-    } else {
-      window.APP.data.students.push({id: window.APP.uuid(), name: name.trim(), studentNo: studentNo.trim(), school: school.trim()});
-    }
-    window.APP.saveData();
-    render();
-    window.APP.toast('已儲存學生資料');
+    window.APP.openFormModal({
+      title: s ? '編輯學生' : '新增學生',
+      fields: [
+        {key:'name', label:'姓名', type:'text', value: s ? s.name : '', required:true},
+        {key:'studentNo', label:'學號', type:'text', value: s ? s.studentNo : ''},
+        {key:'school', label:'學校', type:'text', value: s ? s.school : ''}
+      ],
+      onSave: function(values){
+        if(s){
+          s.name = values.name.trim(); s.studentNo = values.studentNo.trim(); s.school = values.school.trim();
+        } else {
+          window.APP.data.students.push({id: window.APP.uuid(), name: values.name.trim(), studentNo: values.studentNo.trim(), school: values.school.trim()});
+        }
+        window.APP.saveData();
+        render();
+        window.APP.toast('已儲存學生資料');
+      }
+    });
   }
 
   document.getElementById('addStudentBtn').addEventListener('click', function(){ openStudentModal(null); });
@@ -975,68 +1014,6 @@
   });
 
   window.APP.renderStudents = render;
-})();
-
-/* ============ Stations module ============ */
-(function(){
-  function render(){
-    var stations = window.APP.data.stations;
-    var tbody = document.querySelector('#stationsTable tbody');
-    document.getElementById('stationsEmpty').style.display = stations.length ? 'none' : 'block';
-    tbody.innerHTML = stations.map(function(s){
-      return '<tr><td>' + s.name + '</td>' +
-        '<td><button class="btn btn-sm btn-danger deleteStationBtn" data-id="' + s.id + '">刪除</button></td></tr>';
-    }).join('');
-    tbody.querySelectorAll('.deleteStationBtn').forEach(function(b){
-      b.addEventListener('click', function(){
-        if(!confirm('確定要刪除這個站別嗎?')) return;
-        window.APP.data.stations = window.APP.data.stations.filter(function(s){ return s.id !== b.getAttribute('data-id'); });
-        window.APP.saveData(); render();
-      });
-    });
-    window.APP.refreshSharedDropdowns && window.APP.refreshSharedDropdowns();
-  }
-
-  document.getElementById('addStationBtn').addEventListener('click', function(){
-    var name = prompt('站別名稱');
-    if(!name || !name.trim()) return;
-    window.APP.data.stations.push({id: window.APP.uuid(), name: name.trim()});
-    window.APP.saveData(); render();
-    window.APP.toast('已新增站別');
-  });
-
-  document.getElementById('downloadStationTemplateBtn').addEventListener('click', function(){
-    var csv = window.APP.toCsv(['站別名稱'], [['乳房攝影室']]);
-    window.APP.downloadText(csv, '站別清單範本.csv');
-  });
-
-  document.getElementById('importStationBtn').addEventListener('click', function(){
-    document.getElementById('stationFileInput').click();
-  });
-  document.getElementById('stationFileInput').addEventListener('change', function(e){
-    var file = e.target.files[0];
-    if(!file) return;
-    var reader = new FileReader();
-    reader.onload = function(ev){
-      var parsed = window.APP.parseCsv(ev.target.result);
-      var added = 0;
-      parsed.data.forEach(function(row){
-        var name = row['站別名稱'] || '';
-        if(!name) return;
-        var exists = window.APP.data.stations.find(function(s){ return s.name === name; });
-        if(!exists){
-          window.APP.data.stations.push({id: window.APP.uuid(), name: name});
-          added++;
-        }
-      });
-      window.APP.saveData(); render();
-      window.APP.toast('匯入完成,新增 ' + added + ' 個站別');
-      e.target.value = '';
-    };
-    reader.readAsText(file, 'UTF-8');
-  });
-
-  window.APP.renderStations = render;
 })();
 
 /* ============ Teachers module (with QR codes) ============ */
@@ -1090,22 +1067,24 @@
 
   function openTeacherModal(id){
     var t = id ? window.APP.data.teachers.find(function(x){ return x.id === id; }) : null;
-    var name = prompt('老師姓名', t ? t.name : '');
-    if(name === null) return;
-    if(!name.trim()){ alert('姓名不可空白'); return; }
-    var department = prompt('科別', t ? t.department : '');
-    if(department === null) return;
-    var stationNames = window.APP.data.stations.map(function(s){ return s.name; }).join('、');
-    var primaryStation = prompt('主要站別(選填,可留空;目前已建立站別:' + stationNames + ')', t ? (t.primaryStation||'') : '');
-    if(primaryStation === null) return;
-    if(t){
-      t.name = name.trim(); t.department = department.trim(); t.primaryStation = primaryStation.trim();
-    } else {
-      window.APP.data.teachers.push({id: window.APP.uuid(), name: name.trim(), department: department.trim(), primaryStation: primaryStation.trim()});
-    }
-    window.APP.saveData();
-    render();
-    window.APP.toast('已儲存老師資料');
+    window.APP.openFormModal({
+      title: t ? '編輯老師' : '新增老師',
+      fields: [
+        {key:'name', label:'老師姓名', type:'text', value: t ? t.name : '', required:true},
+        {key:'department', label:'科別', type:'text', value: t ? t.department : ''},
+        {key:'primaryStation', label:'主要站別(選填)', type:'text', value: t ? (t.primaryStation||'') : '', placeholder:'例如:乳房攝影室'}
+      ],
+      onSave: function(values){
+        if(t){
+          t.name = values.name.trim(); t.department = values.department.trim(); t.primaryStation = values.primaryStation.trim();
+        } else {
+          window.APP.data.teachers.push({id: window.APP.uuid(), name: values.name.trim(), department: values.department.trim(), primaryStation: values.primaryStation.trim()});
+        }
+        window.APP.saveData();
+        render();
+        window.APP.toast('已儲存老師資料');
+      }
+    });
   }
 
   function makeQrDataUrl(teacherId, cb){
@@ -1242,47 +1221,36 @@ window.APP.refreshSharedDropdowns = function(){
     });
   }
 
-  function isValidDateStr(s){
-    return /^\d{4}-\d{2}-\d{2}$/.test(s);
-  }
-
   function openScheduleModal(){
     var students = window.APP.data.students;
-    var stations = window.APP.data.stations;
     if(students.length === 0){ alert('請先建立學生資料'); return; }
 
-    var week = prompt('週次(數字)');
-    if(week === null || !week.trim()) return;
-
     var todayStr = window.APP.formatDate(new Date());
-    var startDate = prompt('開始日期(格式 YYYY-MM-DD,例如 ' + todayStr + ')', todayStr);
-    if(startDate === null || !startDate.trim()) return;
-    startDate = startDate.trim();
-    if(!isValidDateStr(startDate)){ alert('日期格式不正確,請使用 YYYY-MM-DD 格式(例如 ' + todayStr + '),不要用 2026/6/17 這種斜線格式'); return; }
+    var studentOptions = students.map(function(s){ return {value: s.id, label: s.name}; });
 
-    var endDate = prompt('結束日期(格式 YYYY-MM-DD,例如 ' + todayStr + ')', startDate);
-    if(endDate === null || !endDate.trim()) return;
-    endDate = endDate.trim();
-    if(!isValidDateStr(endDate)){ alert('日期格式不正確,請使用 YYYY-MM-DD 格式(例如 ' + todayStr + '),不要用 2026/6/17 這種斜線格式'); return; }
-
-    var studentNames = students.map(function(s){ return s.name; }).join('、');
-    var studentNameInput = prompt('學生姓名(現有學生:' + studentNames + ')');
-    if(studentNameInput === null || !studentNameInput.trim()) return;
-    var student = students.find(function(s){ return s.name === studentNameInput.trim(); });
-    if(!student){ alert('找不到此學生,請確認姓名是否正確'); return; }
-
-    var stationHint = stations.length ? ('現有站別:' + stations.map(function(s){ return s.name; }).join('、')) : '尚未建立站別清單,可直接輸入站別名稱文字';
-    var station = prompt('應到站別(' + stationHint + ')');
-    if(station === null || !station.trim()) return;
-
-    window.APP.data.schedule.push({
-      id: window.APP.uuid(), week: parseInt(week,10) || 0,
-      startDate: startDate, endDate: endDate,
-      studentId: student.id, station: station.trim()
+    window.APP.openFormModal({
+      title: '新增排程',
+      fields: [
+        {key:'week', label:'週次', type:'number', value:'', required:true, placeholder:'例如 1'},
+        {key:'startDate', label:'開始日期', type:'date', value: todayStr, required:true},
+        {key:'endDate', label:'結束日期', type:'date', value: todayStr, required:true},
+        {key:'studentId', label:'學生', type:'select', value: studentOptions[0] ? studentOptions[0].value : '', options: studentOptions, required:true},
+        {key:'station', label:'應到站別', type:'text', value:'', required:true, placeholder:'例如:乳房攝影室'}
+      ],
+      onSave: function(values){
+        window.APP.data.schedule.push({
+          id: window.APP.uuid(),
+          week: parseInt(values.week,10) || 0,
+          startDate: values.startDate,
+          endDate: values.endDate,
+          studentId: values.studentId,
+          station: values.station.trim()
+        });
+        window.APP.saveData();
+        render();
+        window.APP.toast('已新增排程');
+      }
     });
-    window.APP.saveData();
-    render();
-    window.APP.toast('已新增排程');
   }
 
   document.getElementById('addScheduleBtn').addEventListener('click', openScheduleModal);
@@ -1410,49 +1378,56 @@ window.APP.refreshSharedDropdowns = function(){
     var teachers = window.APP.data.teachers;
     if(!r && (students.length === 0)){ alert('請先建立學生資料'); return; }
 
-    var studentNameVal = prompt('學生姓名', r ? r.studentName : (students[0] ? students[0].name : ''));
-    if(studentNameVal === null) return;
-    var student = students.find(function(s){ return s.name === studentNameVal.trim(); });
-    if(!student){ alert('找不到此學生'); return; }
+    var studentOptions = students.map(function(s){ return {value: s.id, label: s.name}; });
+    var teacherOptions = [{value:'', label:'(無/手動輸入名稱)'}].concat(
+      teachers.map(function(t){ return {value: t.id, label: t.name}; })
+    );
 
-    var teacherNameVal = prompt('老師姓名', r ? r.teacherName : '');
-    if(teacherNameVal === null) return;
-    var teacher = teachers.find(function(t){ return t.name === teacherNameVal.trim(); });
+    var defaultStudentId = r ? r.studentId : (studentOptions[0] ? studentOptions[0].value : '');
+    var defaultTeacherId = r ? r.teacherId : '';
 
-    var date = prompt('日期(YYYY-MM-DD)', r ? r.date : window.APP.formatDate(new Date()));
-    if(date === null) return;
-    var time = prompt('時間(HH:MM)', r ? r.time : '08:00');
-    if(time === null) return;
-    var station = prompt('站別', r ? r.station : '');
-    if(station === null) return;
-    var type = prompt('類型(輸入 checkin 表示簽到,checkout 表示簽退)', r ? r.type : 'checkin');
-    if(type === null) return;
-    var note = prompt('備註(選填)', r ? (r.note||'') : '');
-    if(note === null) return;
+    window.APP.openFormModal({
+      title: r ? '編輯簽到紀錄' : '手動補登紀錄',
+      fields: [
+        {key:'studentId', label:'學生', type:'select', value: defaultStudentId, options: studentOptions, required:true},
+        {key:'teacherId', label:'老師', type:'select', value: defaultTeacherId, options: teacherOptions},
+        {key:'teacherNameManual', label:'老師姓名(若上方選「無」,請在此手動輸入)', type:'text', value: r ? r.teacherName : ''},
+        {key:'date', label:'日期', type:'date', value: r ? r.date : window.APP.formatDate(new Date()), required:true},
+        {key:'time', label:'時間', type:'time', value: r ? r.time : '08:00', required:true},
+        {key:'station', label:'站別', type:'text', value: r ? r.station : ''},
+        {key:'type', label:'類型', type:'select', value: r ? r.type : 'checkin', options:[{value:'checkin',label:'簽到'},{value:'checkout',label:'簽退'}]},
+        {key:'note', label:'備註(選填)', type:'text', value: r ? (r.note||'') : ''}
+      ],
+      onSave: function(values){
+        var student = students.find(function(s){ return s.id === values.studentId; });
+        if(!student){ alert('找不到此學生'); return; }
+        var teacher = teachers.find(function(t){ return t.id === values.teacherId; });
+        var teacherName = teacher ? teacher.name : (values.teacherNameManual.trim() || '(未指定老師)');
+        var dt = new Date(values.date + 'T' + values.time + ':00');
 
-    var dt = new Date(date + 'T' + time + ':00');
-
-    if(r){
-      r.studentId = student.id; r.studentName = student.name;
-      r.teacherId = teacher ? teacher.id : r.teacherId;
-      r.teacherName = teacherNameVal.trim();
-      r.date = date.trim(); r.time = time.trim(); r.station = station.trim();
-      r.type = (type.trim() === 'checkout') ? 'checkout' : 'checkin';
-      r.note = note.trim();
-      r.timestamp = dt.getTime() || r.timestamp;
-    } else {
-      window.APP.data.records.push({
-        id: window.APP.uuid(), studentId: student.id, studentName: student.name,
-        teacherId: teacher ? teacher.id : '', teacherName: teacherNameVal.trim(),
-        date: date.trim(), time: time.trim(), station: station.trim(),
-        type: (type.trim() === 'checkout') ? 'checkout' : 'checkin',
-        note: note.trim(), timestamp: dt.getTime() || Date.now()
-      });
-    }
-    window.APP.saveData();
-    render();
-    window.APP.refreshDashboard && window.APP.refreshDashboard();
-    window.APP.toast('已儲存紀錄');
+        if(r){
+          r.studentId = student.id; r.studentName = student.name;
+          r.teacherId = teacher ? teacher.id : '';
+          r.teacherName = teacherName;
+          r.date = values.date; r.time = values.time; r.station = values.station.trim();
+          r.type = values.type;
+          r.note = values.note.trim();
+          r.timestamp = dt.getTime() || r.timestamp;
+        } else {
+          window.APP.data.records.push({
+            id: window.APP.uuid(), studentId: student.id, studentName: student.name,
+            teacherId: teacher ? teacher.id : '', teacherName: teacherName,
+            date: values.date, time: values.time, station: values.station.trim(),
+            type: values.type,
+            note: values.note.trim(), timestamp: dt.getTime() || Date.now()
+          });
+        }
+        window.APP.saveData();
+        render();
+        window.APP.refreshDashboard && window.APP.refreshDashboard();
+        window.APP.toast('已儲存紀錄');
+      }
+    });
   }
 
   document.getElementById('addRecordBtn').addEventListener('click', function(){ openRecordModal(null); });
@@ -1851,7 +1826,6 @@ window.APP.refreshSharedDropdowns = function(){
   window.APP.renderAll = function(){
     window.APP.renderStudents && window.APP.renderStudents();
     window.APP.renderTeachers && window.APP.renderTeachers();
-    window.APP.renderStations && window.APP.renderStations();
     window.APP.renderSchedule && window.APP.renderSchedule();
     window.APP.renderRecords && window.APP.renderRecords();
     window.APP.renderLeaves && window.APP.renderLeaves();
@@ -1864,7 +1838,6 @@ window.APP.refreshSharedDropdowns = function(){
     if(pageId === 'dashboard') window.APP.refreshDashboard && window.APP.refreshDashboard();
     if(pageId === 'students') window.APP.renderStudents && window.APP.renderStudents();
     if(pageId === 'teachers') window.APP.renderTeachers && window.APP.renderTeachers();
-    if(pageId === 'stations') window.APP.renderStations && window.APP.renderStations();
     if(pageId === 'schedule') window.APP.renderSchedule && window.APP.renderSchedule();
     if(pageId === 'records') window.APP.renderRecords && window.APP.renderRecords();
     if(pageId === 'leaves') window.APP.renderLeaves && window.APP.renderLeaves();
