@@ -1,24 +1,36 @@
 {
   "hospitalName": "土城醫院醫事放射",
   "teachers": [
-    { "id": "T001", "name": "陳醫師", "department": "放射科", "primaryStation": "乳房攝影室" },
-    { "id": "T002", "name": "林醫師", "department": "放射科", "primaryStation": "電腦斷層室" },
-    { "id": "T003", "name": "張醫師", "department": "放射科", "primaryStation": "血管攝影室" }
+    {
+      "id": "x1781680368565-4a9xs4",
+      "name": "黃怡璇",
+      "department": "影像診療科",
+      "primaryStation": "乳房攝影室"
+    },
+    {
+      "id": "x1781680389681-ghq1kc",
+      "name": "張玉貞",
+      "department": "影像診療科",
+      "primaryStation": "MRI"
+    }
   ],
   "students": [
-    { "id": "A001", "name": "王小明", "school": "長庚科技大學" }
+    {
+      "id": "x1781680624030-6uh190",
+      "name": "王大大",
+      "studentNo": "11501a",
+      "school": "元培科大"
+    }
   ],
-  "stations": [
-    { "name": "乳房攝影室" },
-    { "name": "電腦斷層室" },
-    { "name": "血管攝影室" },
-    { "name": "一般X光室" },
-    { "name": "超音波室" }
-  ],
+  "stations": [],
   "schedule": [
-    { "week": 1, "startDate": "2026-07-06", "endDate": "2026-07-12", "studentId": "A001", "station": "乳房攝影室" },
-    { "week": 2, "startDate": "2026-07-13", "endDate": "2026-07-19", "studentId": "A001", "station": "電腦斷層室" },
-    { "week": 3, "startDate": "2026-07-20", "endDate": "2026-07-26", "studentId": "A001", "station": "血管攝影室" }
+    {
+      "week": 1,
+      "startDate": "2026/7/6",
+      "endDate": "2026/7/12",
+      "studentId": "x1781680624030-6uh190",
+      "station": "R1"
+    }
   ],
   "settings": {
     "duplicateThresholdMinutes": 2,
