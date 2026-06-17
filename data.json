@@ -2,24 +2,18 @@
   "hospitalName": "土城醫院醫事放射",
   "teachers": [
     {
-      "id": "x1781680368565-4a9xs4",
+      "id": "x1781683270851-vzmy53",
       "name": "黃怡璇",
       "department": "影像診療科",
       "primaryStation": "乳房攝影室"
-    },
-    {
-      "id": "x1781680389681-ghq1kc",
-      "name": "張玉貞",
-      "department": "影像診療科",
-      "primaryStation": "MRI"
     }
   ],
   "students": [
     {
-      "id": "x1781680624030-6uh190",
+      "id": "x1781683249840-ccxy3y",
       "name": "王大大",
-      "studentNo": "11501a",
-      "school": "元培科大"
+      "studentNo": "A001",
+      "school": "長庚科技大學"
     }
   ],
   "stations": [],
@@ -28,14 +22,14 @@
       "week": 1,
       "startDate": "2026/6/15",
       "endDate": "2026/6/17",
-      "studentId": "x1781680624030-6uh190",
+      "studentId": "x1781683249840-ccxy3y",
       "station": "R1"
     },
     {
       "week": 1,
       "startDate": "2026/6/18",
       "endDate": "2026/6/19",
-      "studentId": "x1781680624030-6uh190",
+      "studentId": "x1781683249840-ccxy3y",
       "station": "R2"
     }
   ],
