@@ -315,7 +315,6 @@
       <!-- ========== DASHBOARD ========== -->
       <section class="page" id="page-dashboard">
         <h2 class="page-title">總覽</h2>
-        <p class="page-sub" id="dashSub">—</p>
 
         <div class="metric-grid">
           <div class="metric-card">
@@ -419,7 +418,7 @@
       <!-- ========== SCHEDULE ========== -->
       <section class="page" id="page-schedule">
         <h2 class="page-title">排程表管理</h2>
-        <p class="page-sub">設定每位學生每週應到站別,實習自 <span id="scheduleStartDateLabel">—</span> 起算第1週,共 <span id="scheduleTotalWeeksLabel">—</span> 週</p>
+        <p class="page-sub">設定每位學生每週應到站別</p>
 
         <div class="card">
           <div class="toolbar">
@@ -1193,9 +1192,6 @@ window.APP.refreshSharedDropdowns = function(){
   }
 
   function render(){
-    document.getElementById('scheduleStartDateLabel').textContent = window.APP.data.settings.internshipStartDate || '—';
-    document.getElementById('scheduleTotalWeeksLabel').textContent = window.APP.data.settings.totalWeeks || '—';
-
     var schedule = window.APP.data.schedule.slice().sort(function(a,b){
       if(a.week !== b.week) return a.week - b.week;
       return studentName(a.studentId).localeCompare(studentName(b.studentId));
@@ -1622,12 +1618,6 @@ window.APP.refreshSharedDropdowns = function(){
 
 /* ============ Dashboard module ============ */
 (function(){
-  function weekRangeLabel(){
-    var start = window.APP.data.settings.internshipStartDate;
-    var totalWeeks = window.APP.data.settings.totalWeeks;
-    return start ? ('實習自 ' + start + ' 起算,共 ' + totalWeeks + ' 週') : '尚未設定實習開始日期(請至系統設定)';
-  }
-
   function getWeekNumber(dateStr){
     var start = window.APP.data.settings.internshipStartDate;
     if(!start) return null;
@@ -1653,7 +1643,6 @@ window.APP.refreshSharedDropdowns = function(){
   }
 
   function render(){
-    document.getElementById('dashSub').textContent = weekRangeLabel();
     document.getElementById('metricStudents').textContent = window.APP.data.students.length;
 
     var range = thisWeekRange();
