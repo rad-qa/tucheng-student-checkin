@@ -20,15 +20,15 @@
   "schedule": [
     {
       "week": 1,
-      "startDate": "2026/6/15",
-      "endDate": "2026/6/17",
+      "startDate": "2026-06-15",
+      "endDate": "2026-06-17",
       "studentId": "x1781683249840-ccxy3y",
       "station": "R1"
     },
     {
       "week": 1,
-      "startDate": "2026/6/18",
-      "endDate": "2026/6/19",
+      "startDate": "2026-06-18",
+      "endDate": "2026-06-19",
       "studentId": "x1781683249840-ccxy3y",
       "station": "R2"
     }
