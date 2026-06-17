@@ -713,14 +713,39 @@
     };
   }
 
+  function normalizeData(d){
+    var def = defaultData();
+    if(!d || typeof d !== 'object') d = {};
+    for(var k in def){
+      if(!(k in d) || d[k] === null || d[k] === undefined){
+        d[k] = def[k];
+      }
+    }
+    // arrays must actually be arrays
+    ['teachers','students','stations','schedule','records','leaves'].forEach(function(key){
+      if(!Array.isArray(d[key])) d[key] = [];
+    });
+    // settings must be an object with every sub-field present
+    if(typeof d.settings !== 'object' || d.settings === null || Array.isArray(d.settings)){
+      d.settings = def.settings;
+    } else {
+      for(var sk in def.settings){
+        if(!(sk in d.settings) || d.settings[sk] === null || d.settings[sk] === undefined || d.settings[sk] === ''){
+          d.settings[sk] = def.settings[sk];
+        }
+      }
+    }
+    if(typeof d.password !== 'string' || !d.password){ d.password = def.password; }
+    return d;
+  }
+  window.APP_normalizeData = normalizeData;
+
   function loadData(){
     try{
       var raw = localStorage.getItem(DATA_KEY);
       if(!raw) return defaultData();
       var d = JSON.parse(raw);
-      var def = defaultData();
-      for(var k in def){ if(!(k in d)) d[k] = def[k]; }
-      return d;
+      return normalizeData(d);
     }catch(e){
       return defaultData();
     }
@@ -1552,7 +1577,7 @@ window.APP.refreshSharedDropdowns = function(){
     reader.onload = function(ev){
       try{
         var json = JSON.parse(ev.target.result);
-        window.APP.data = json;
+        window.APP.data = window.APP_normalizeData(json);
         window.APP.saveData();
         window.APP.renderAll && window.APP.renderAll();
         window.APP.toast('資料已同步匯入');
