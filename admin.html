@@ -1,0 +1,1836 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>土城醫院醫事放射 - 實習管理系統</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+  :root{
+    --bg:#F7F4ED;
+    --bg-card:#FFFFFF;
+    --bg-soft:#EFEBE1;
+    --teal-50:#E9F5F0;
+    --teal-100:#CFE9DF;
+    --teal-400:#5E9C86;
+    --teal-600:#3D7864;
+    --teal-800:#295247;
+    --ink:#3D3935;
+    --ink-soft:#756F66;
+    --ink-faint:#A6A096;
+    --border:#E3DDD0;
+    --amber-50:#FBF1E0;
+    --amber-600:#B8842E;
+    --rose-50:#FBEEEA;
+    --rose-600:#B5604A;
+    --red-50:#FBEAEA;
+    --red-600:#B23B3B;
+    --radius-sm:6px;
+    --radius-md:10px;
+    --radius-lg:18px;
+    --sidebar-w:220px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Noto Sans TC',sans-serif;
+    font-size:16px;
+    line-height:1.6;
+  }
+  h1,h2,h3{font-family:'Noto Serif TC',serif;font-weight:700;margin:0;}
+  button, input, select, textarea{font-family:'Noto Sans TC',sans-serif;font-size:15px;}
+  input, select, textarea{
+    border:1px solid var(--border);
+    border-radius:var(--radius-sm);
+    padding:9px 11px;
+    background:#fff;
+    color:var(--ink);
+  }
+  input:focus, select:focus, textarea:focus{
+    outline:none;border-color:var(--teal-400);box-shadow:0 0 0 3px var(--teal-100);
+  }
+  button{cursor:pointer;}
+  .btn{
+    border:1px solid var(--border);
+    background:#fff;
+    color:var(--ink);
+    padding:9px 16px;
+    border-radius:var(--radius-md);
+    font-size:14px;
+    font-weight:500;
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .btn:hover{background:var(--bg-soft);}
+  .btn-primary{
+    background:var(--teal-600);
+    color:#fff;
+    border-color:var(--teal-600);
+  }
+  .btn-primary:hover{background:var(--teal-800);border-color:var(--teal-800);}
+  .btn-danger{
+    background:#fff;color:var(--red-600);border-color:var(--red-600);
+  }
+  .btn-danger:hover{background:var(--red-50);}
+  .btn-sm{padding:6px 12px;font-size:13px;}
+  .icon{width:16px;height:16px;flex-shrink:0;}
+  .icon-lg{width:20px;height:20px;}
+
+  /* ---------- Login ---------- */
+  #loginScreen{
+    min-height:100vh;
+    display:flex;align-items:center;justify-content:center;
+    padding:20px;
+  }
+  .login-card{
+    width:100%;max-width:380px;
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:var(--radius-lg);
+    padding:36px 30px;
+    text-align:center;
+  }
+  .login-mark{
+    width:60px;height:60px;border-radius:50%;
+    background:var(--teal-50);
+    display:flex;align-items:center;justify-content:center;
+    margin:0 auto 14px;
+  }
+  .login-mark svg{width:30px;height:30px;color:var(--teal-600);}
+  .login-card h1{font-size:21px;margin-bottom:4px;}
+  .login-card p.sub{color:var(--ink-soft);font-size:14px;margin:0 0 22px;}
+  .login-card input{width:100%;padding:13px 14px;font-size:16px;margin-bottom:14px;text-align:center;}
+  .login-card .btn-primary{width:100%;padding:13px;font-size:16px;justify-content:center;}
+  .login-error{color:var(--red-600);font-size:13px;margin-bottom:10px;min-height:18px;}
+
+  /* ---------- App shell ---------- */
+  #appShell{display:none;}
+  #appShell.active{display:flex;min-height:100vh;}
+
+  .sidebar{
+    width:var(--sidebar-w);
+    flex-shrink:0;
+    background:var(--bg-soft);
+    border-right:1px solid var(--border);
+    padding:22px 14px;
+    position:fixed;
+    top:0;left:0;bottom:0;
+    overflow-y:auto;
+    z-index:50;
+  }
+  .sidebar-brand{
+    display:flex;align-items:center;gap:10px;
+    padding:0 8px;margin-bottom:24px;
+  }
+  .sidebar-brand .mark{
+    width:34px;height:34px;border-radius:50%;
+    background:var(--teal-50);display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .sidebar-brand .mark svg{width:18px;height:18px;color:var(--teal-600);}
+  .sidebar-brand .label{font-size:14px;font-weight:700;line-height:1.3;}
+  .nav-list{display:flex;flex-direction:column;gap:3px;}
+  .nav-item{
+    display:flex;align-items:center;gap:10px;
+    padding:11px 12px;border-radius:var(--radius-md);
+    font-size:15px;font-weight:500;text-decoration:none;color:var(--ink-soft);
+    cursor:pointer;
+  }
+  .nav-item svg{width:18px;height:18px;flex-shrink:0;}
+  .nav-item:hover{background:var(--bg-card);}
+  .nav-item.active{background:var(--bg-card);color:var(--ink);}
+  .nav-footer{margin-top:18px;padding-top:14px;border-top:1px solid var(--border);}
+
+  .main-area{
+    flex:1;
+    margin-left:var(--sidebar-w);
+    padding:28px 32px 60px;
+    min-width:0;
+  }
+  .topbar-mobile{
+    display:none;
+    align-items:center;justify-content:space-between;
+    padding:14px 16px;
+    background:var(--bg-card);
+    border-bottom:1px solid var(--border);
+    position:sticky;top:0;z-index:40;
+  }
+  .topbar-mobile .brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;}
+  .topbar-mobile .brand .mark{width:28px;height:28px;border-radius:50%;background:var(--teal-50);display:flex;align-items:center;justify-content:center;}
+  .topbar-mobile .brand .mark svg{width:15px;height:15px;color:var(--teal-600);}
+  .hamburger-btn{
+    background:none;border:none;padding:6px;display:flex;align-items:center;
+  }
+  .hamburger-btn svg{width:24px;height:24px;color:var(--ink);}
+
+  .sidebar-overlay{
+    display:none;
+    position:fixed;inset:0;
+    background:rgba(61,57,53,0.4);
+    z-index:45;
+  }
+
+  .page-title{font-size:24px;margin-bottom:6px;}
+  .page-sub{color:var(--ink-soft);font-size:14px;margin:0 0 24px;}
+
+  .card{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:var(--radius-lg);
+    padding:20px 22px;
+    margin-bottom:20px;
+  }
+  .card-title{font-size:17px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+  .card-title h3{font-size:17px;}
+
+  .metric-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:22px;}
+  .metric-card{background:var(--bg-soft);border-radius:var(--radius-md);padding:16px 18px;}
+  .metric-card .lbl{font-size:13px;color:var(--ink-soft);margin:0 0 4px;}
+  .metric-card .val{font-size:26px;font-weight:700;margin:0;font-family:'Noto Serif TC',serif;}
+  .metric-card .val.warn{color:var(--amber-600);}
+
+  table{width:100%;border-collapse:collapse;font-size:14.5px;}
+  thead th{
+    text-align:left;color:var(--ink-soft);font-weight:500;
+    padding:10px 8px;border-bottom:1px solid var(--border);
+    white-space:nowrap;
+  }
+  tbody td{padding:10px 8px;border-bottom:1px solid var(--border);}
+  tbody tr:last-child td{border-bottom:none;}
+  .table-wrap{overflow-x:auto;}
+
+  .tag{font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;}
+  .tag.checkin{background:var(--teal-50);color:var(--teal-800);}
+  .tag.checkout{background:var(--bg-soft);color:var(--ink-soft);}
+  .tag.warn{background:var(--amber-50);color:var(--amber-600);}
+  .tag.leave{background:var(--rose-50);color:var(--rose-600);}
+
+  .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:14px;}
+  .form-field{display:flex;flex-direction:column;gap:6px;}
+  .form-field label{font-size:13px;color:var(--ink-soft);font-weight:500;}
+  .form-field input, .form-field select{width:100%;}
+
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px;}
+  .toolbar .spacer{flex:1;}
+
+  .empty-state{text-align:center;color:var(--ink-faint);font-size:14px;padding:30px 0;}
+
+  .modal-overlay{
+    display:none;
+    position:fixed;inset:0;background:rgba(61,57,53,0.45);
+    align-items:center;justify-content:center;z-index:100;padding:20px;
+  }
+  .modal-overlay.active{display:flex;}
+  .modal-box{
+    background:var(--bg-card);border-radius:var(--radius-lg);
+    padding:26px 26px;max-width:480px;width:100%;max-height:86vh;overflow-y:auto;
+  }
+  .modal-box h3{margin-bottom:16px;}
+
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    background:var(--teal-800);color:#fff;padding:12px 22px;border-radius:var(--radius-md);
+    font-size:14px;z-index:200;display:none;
+  }
+
+  .page{display:none;}
+  .page.active{display:block;}
+
+  @media (max-width: 880px){
+    .sidebar{display:none;}
+    .sidebar.mobile-open{display:block;width:260px;}
+    .main-area{margin-left:0;padding:20px 16px 60px;}
+    .topbar-mobile{display:flex;}
+    .sidebar-overlay.active{display:block;}
+    .metric-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+    .form-grid{grid-template-columns:1fr;}
+  }
+
+  @media print{
+    .sidebar, .topbar-mobile, .toolbar, .no-print{display:none !important;}
+    .main-area{margin-left:0;padding:0;}
+    body{background:#fff;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2 7 4-14 2 7h6"/></svg>
+    </div>
+    <h1>土城醫院醫事放射</h1>
+    <p class="sub">實習管理系統</p>
+    <div class="login-error" id="loginError"></div>
+    <input type="password" id="loginPassword" placeholder="請輸入管理密碼" autocomplete="current-password">
+    <button class="btn btn-primary" id="loginBtn">登入</button>
+  </div>
+</div>
+
+<!-- ================= APP SHELL ================= -->
+<div id="appShell">
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2 7 4-14 2 7h6"/></svg></div>
+      <div class="label">實習管理系統</div>
+    </div>
+    <nav class="nav-list" id="navList">
+      <a class="nav-item" data-page="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>總覽</a>
+      <a class="nav-item" data-page="records"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>簽到紀錄</a>
+      <a class="nav-item" data-page="leaves"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>請假管理</a>
+      <a class="nav-item" data-page="students"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>學生</a>
+      <a class="nav-item" data-page="teachers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>老師 / QR Code</a>
+      <a class="nav-item" data-page="stations"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>站別</a>
+      <a class="nav-item" data-page="schedule"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>排程表</a>
+      <a class="nav-item" data-page="reports"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>報表匯出</a>
+      <a class="nav-item" data-page="sync"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>資料同步</a>
+      <a class="nav-item" data-page="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>系統設定</a>
+    </nav>
+    <div class="nav-footer">
+      <a class="nav-item" id="logoutBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>登出</a>
+    </div>
+  </aside>
+
+  <div class="main-area">
+    <div class="topbar-mobile">
+      <button class="hamburger-btn" id="hamburgerBtn" aria-label="開啟選單">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="brand">
+        <div class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2 7 4-14 2 7h6"/></svg></div>
+        土城醫院醫事放射
+      </div>
+      <div style="width:24px;"></div>
+    </div>
+
+    <div id="pageContainer">
+
+      <!-- ========== DASHBOARD ========== -->
+      <section class="page" id="page-dashboard">
+        <h2 class="page-title">總覽</h2>
+        <p class="page-sub" id="dashSub">—</p>
+
+        <div class="metric-grid">
+          <div class="metric-card">
+            <p class="lbl">實習學生數</p>
+            <p class="val" id="metricStudents">0</p>
+          </div>
+          <div class="metric-card">
+            <p class="lbl">本週簽到天數</p>
+            <p class="val" id="metricAttend">0</p>
+          </div>
+          <div class="metric-card">
+            <p class="lbl">本週請假天數</p>
+            <p class="val" id="metricLeave">0</p>
+          </div>
+          <div class="metric-card">
+            <p class="lbl">站別待確認</p>
+            <p class="val warn" id="metricMismatch">0</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><h3>最近簽到紀錄</h3></div>
+          <div class="table-wrap">
+            <table id="dashRecentTable">
+              <thead><tr><th>日期</th><th>學生</th><th>站別</th><th>老師</th><th>類型</th><th>時間</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== STUDENTS ========== -->
+      <section class="page" id="page-students">
+        <h2 class="page-title">學生管理</h2>
+        <p class="page-sub">維護實習學生名單,可使用 CSV 批次匯入</p>
+
+        <div class="card">
+          <div class="toolbar">
+            <button class="btn" id="downloadStudentTemplateBtn">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              下載 CSV 範本
+            </button>
+            <button class="btn" id="importStudentBtn">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              匯入 CSV
+            </button>
+            <input type="file" id="studentFileInput" accept=".csv" style="display:none;">
+            <div class="spacer"></div>
+            <button class="btn btn-primary" id="addStudentBtn">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              新增學生
+            </button>
+          </div>
+          <div class="table-wrap">
+            <table id="studentsTable">
+              <thead><tr><th>姓名</th><th>學號</th><th>學校</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="empty-state" id="studentsEmpty" style="display:none;">尚未建立任何學生資料</div>
+        </div>
+      </section>
+
+      <!-- ========== TEACHERS ========== -->
+      <section class="page" id="page-teachers">
+        <h2 class="page-title">老師 / QR Code</h2>
+        <p class="page-sub">建立老師資料後,系統會自動產生固定 QR Code,交給老師手機保存出示</p>
+
+        <div class="card">
+          <div class="toolbar">
+            <button class="btn" id="downloadTeacherTemplateBtn">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              下載 CSV 範本
+            </button>
+            <button class="btn" id="importTeacherBtn">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              匯入 CSV
+            </button>
+            <input type="file" id="teacherFileInput" accept=".csv" style="display:none;">
+            <button class="btn" id="downloadAllQrBtn">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/><path d="M8 3H5a2 2 0 0 0-2 2v3"/><rect x="9" y="9" width="6" height="6"/></svg>
+              打包下載所有 QR Code
+            </button>
+            <div class="spacer"></div>
+            <button class="btn btn-primary" id="addTeacherBtn">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              新增老師
+            </button>
+          </div>
+          <p class="page-sub" style="margin-top:-6px;" id="checkinUrlNotice"></p>
+          <div class="table-wrap">
+            <table id="teachersTable">
+              <thead><tr><th>姓名</th><th>科別</th><th>主要站別</th><th>QR Code</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="empty-state" id="teachersEmpty" style="display:none;">尚未建立任何老師資料</div>
+        </div>
+      </section>
+
+      <!-- ========== STATIONS ========== -->
+      <section class="page" id="page-stations">
+        <h2 class="page-title">站別管理</h2>
+        <p class="page-sub">維護所有實習站別清單</p>
+
+        <div class="card">
+          <div class="toolbar">
+            <button class="btn" id="downloadStationTemplateBtn">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              下載 CSV 範本
+            </button>
+            <button class="btn" id="importStationBtn">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              匯入 CSV
+            </button>
+            <input type="file" id="stationFileInput" accept=".csv" style="display:none;">
+            <div class="spacer"></div>
+            <button class="btn btn-primary" id="addStationBtn">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              新增站別
+            </button>
+          </div>
+          <div class="table-wrap">
+            <table id="stationsTable">
+              <thead><tr><th>站別名稱</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="empty-state" id="stationsEmpty" style="display:none;">尚未建立任何站別</div>
+        </div>
+      </section>
+
+      <!-- ========== SCHEDULE ========== -->
+      <section class="page" id="page-schedule">
+        <h2 class="page-title">排程表管理</h2>
+        <p class="page-sub">設定每位學生每週應到站別,實習自 <span id="scheduleStartDateLabel">—</span> 起算第1週,共 <span id="scheduleTotalWeeksLabel">—</span> 週</p>
+
+        <div class="card">
+          <div class="toolbar">
+            <button class="btn" id="downloadScheduleTemplateBtn">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              下載 CSV 範本
+            </button>
+            <button class="btn" id="importScheduleBtn">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              匯入 CSV
+            </button>
+            <input type="file" id="scheduleFileInput" accept=".csv" style="display:none;">
+            <div class="spacer"></div>
+            <button class="btn btn-primary" id="addScheduleBtn">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              新增排程
+            </button>
+          </div>
+          <div class="table-wrap">
+            <table id="scheduleTable">
+              <thead><tr><th>週次</th><th>開始日期</th><th>結束日期</th><th>學生</th><th>站別</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="empty-state" id="scheduleEmpty" style="display:none;">尚未建立任何排程</div>
+        </div>
+      </section>
+
+      <!-- ========== RECORDS ========== -->
+      <section class="page" id="page-records">
+        <h2 class="page-title">簽到紀錄</h2>
+        <p class="page-sub">匯入學生提供的紀錄 JSON,並可手動修正異常紀錄</p>
+
+        <div class="card">
+          <div class="toolbar">
+            <button class="btn btn-primary" id="importStudentJsonBtn">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              匯入學生紀錄 JSON
+            </button>
+            <input type="file" id="studentJsonFileInput" accept=".json" style="display:none;">
+            <div class="spacer"></div>
+            <button class="btn" id="addRecordBtn">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              手動補登紀錄
+            </button>
+          </div>
+          <div class="toolbar">
+            <div class="form-field" style="min-width:160px;">
+              <label>篩選學生</label>
+              <select id="recordFilterStudent"><option value="">全部</option></select>
+            </div>
+            <div class="form-field" style="min-width:160px;">
+              <label>篩選日期(起)</label>
+              <input type="date" id="recordFilterStart">
+            </div>
+            <div class="form-field" style="min-width:160px;">
+              <label>篩選日期(迄)</label>
+              <input type="date" id="recordFilterEnd">
+            </div>
+            <div class="form-field" style="min-width:160px;">
+              <label>只看待確認</label>
+              <select id="recordFilterMismatch"><option value="">全部</option><option value="1">僅顯示站別待確認</option></select>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table id="recordsTable">
+              <thead><tr><th>日期</th><th>學生</th><th>站別</th><th>老師</th><th>類型</th><th>時間</th><th>備註</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="empty-state" id="recordsEmpty" style="display:none;">目前沒有符合條件的紀錄</div>
+        </div>
+      </section>
+
+      <!-- ========== LEAVES ========== -->
+      <section class="page" id="page-leaves">
+        <h2 class="page-title">請假管理</h2>
+        <p class="page-sub">登錄學生請假紀錄</p>
+
+        <div class="card">
+          <div class="toolbar">
+            <div class="spacer"></div>
+            <button class="btn btn-primary" id="addLeaveBtn">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              新增請假紀錄
+            </button>
+          </div>
+          <div class="table-wrap">
+            <table id="leavesTable">
+              <thead><tr><th>日期</th><th>學生</th><th>假別</th><th>備註</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="empty-state" id="leavesEmpty" style="display:none;">尚未登錄任何請假紀錄</div>
+        </div>
+      </section>
+
+      <!-- ========== REPORTS ========== -->
+      <section class="page" id="page-reports">
+        <h2 class="page-title">報表匯出</h2>
+        <p class="page-sub">可自訂期間,匯出 Excel 或列印 PDF</p>
+
+        <div class="card">
+          <div class="card-title"><h3>逐日明細報表</h3></div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label>開始日期</label>
+              <input type="date" id="dailyReportStart">
+            </div>
+            <div class="form-field">
+              <label>結束日期</label>
+              <input type="date" id="dailyReportEnd">
+            </div>
+          </div>
+          <div class="toolbar no-print">
+            <button class="btn" id="dailyReportExcelBtn">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              匯出 Excel
+            </button>
+            <button class="btn btn-primary" id="dailyReportPdfBtn">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+              列印 / 匯出 PDF
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><h3>週次彙整報表</h3></div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label>開始週次</label>
+              <select id="weeklyReportStart"></select>
+            </div>
+            <div class="form-field">
+              <label>結束週次</label>
+              <select id="weeklyReportEnd"></select>
+            </div>
+          </div>
+          <div class="toolbar no-print">
+            <button class="btn" id="weeklyReportExcelBtn">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              匯出 Excel
+            </button>
+            <button class="btn btn-primary" id="weeklyReportPdfBtn">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+              列印 / 匯出 PDF
+            </button>
+          </div>
+        </div>
+
+        <div id="printPreviewArea"></div>
+      </section>
+
+      <!-- ========== SYNC ========== -->
+      <section class="page" id="page-sync">
+        <h2 class="page-title">資料同步</h2>
+        <p class="page-sub">多位管理者之間,透過匯出/匯入 JSON 同步系統資料;另外可匯出 data.json 供學生簽到頁讀取</p>
+
+        <div class="card">
+          <div class="card-title"><h3>管理系統資料(供其他管理者同步)</h3></div>
+          <p class="page-sub" style="margin-bottom:14px;">將目前系統所有資料(學生、老師、站別、排程、紀錄、請假、設定)打包匯出,傳給其他管理者匯入即可同步。</p>
+          <div class="toolbar">
+            <button class="btn btn-primary" id="exportAdminJsonBtn">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              匯出管理系統 JSON
+            </button>
+            <button class="btn" id="importAdminJsonBtn">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              匯入最新資料
+            </button>
+            <input type="file" id="adminJsonFileInput" accept=".json" style="display:none;">
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><h3>data.json(供學生簽到頁使用)</h3></div>
+          <p class="page-sub" style="margin-bottom:14px;">學生簽到頁(checkin.html)需要讀取 data.json 才能顯示老師、學生與排程資訊。每次新增/修改老師、學生、站別或排程後,請重新匯出此檔案,並上傳取代 GitHub 上原本的 data.json。</p>
+          <div class="toolbar">
+            <button class="btn btn-primary" id="exportDataJsonBtn">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              匯出 data.json
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== SETTINGS ========== -->
+      <section class="page" id="page-settings">
+        <h2 class="page-title">系統設定</h2>
+
+        <div class="card">
+          <div class="card-title"><h3>實習期間設定</h3></div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label>實習開始日期(第1週起算日)</label>
+              <input type="date" id="settingStartDate">
+            </div>
+            <div class="form-field">
+              <label>總週數</label>
+              <input type="number" id="settingTotalWeeks" min="1" max="52">
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><h3>誤觸防呆設定</h3></div>
+          <p class="page-sub" style="margin-bottom:14px;">同一學生掃同一位老師的 QR Code,若兩次掃描時間差距在此分鐘數以內,視為誤觸重複,只會更新時間,不會新增簽到/簽退紀錄。</p>
+          <div class="form-grid">
+            <div class="form-field">
+              <label>誤觸判斷門檻(分鐘)</label>
+              <input type="number" id="settingThreshold" min="0" step="0.5">
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><h3>管理密碼</h3></div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label>新密碼</label>
+              <input type="password" id="settingNewPassword" placeholder="輸入新密碼">
+            </div>
+          </div>
+          <button class="btn btn-primary" id="savePasswordBtn">更新密碼</button>
+        </div>
+
+        <button class="btn btn-primary" id="saveSettingsBtn">儲存設定</button>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ Core: storage, auth, navigation ============ */
+(function(){
+
+  var DATA_KEY = 'tucheng-radio-admin-data-v1';
+
+  function defaultData(){
+    return {
+      password: 'admin123',
+      teachers: [],
+      students: [],
+      stations: [],
+      schedule: [],
+      records: [],
+      leaves: [],
+      settings: {
+        duplicateThresholdMinutes: 2,
+        internshipStartDate: '2026-07-06',
+        totalWeeks: 28
+      }
+    };
+  }
+
+  function loadData(){
+    try{
+      var raw = localStorage.getItem(DATA_KEY);
+      if(!raw) return defaultData();
+      var d = JSON.parse(raw);
+      var def = defaultData();
+      for(var k in def){ if(!(k in d)) d[k] = def[k]; }
+      return d;
+    }catch(e){
+      return defaultData();
+    }
+  }
+
+  function saveData(){
+    localStorage.setItem(DATA_KEY, JSON.stringify(window.APP.data));
+  }
+
+  window.APP = window.APP || {};
+  window.APP.data = loadData();
+  window.APP.saveData = saveData;
+
+  window.APP.toast = function(msg){
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    clearTimeout(window.APP._toastTimer);
+    window.APP._toastTimer = setTimeout(function(){ t.style.display = 'none'; }, 2400);
+  };
+
+  window.APP.uuid = function(){
+    return 'x' + Date.now() + '-' + Math.random().toString(36).slice(2,8);
+  };
+
+  function pad(n){ return n < 10 ? '0' + n : '' + n; }
+  window.APP.pad = pad;
+  window.APP.formatDate = function(d){ return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()); };
+
+  /* ---------- Login ---------- */
+  function showApp(){
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appShell').classList.add('active');
+    window.APP.navigate('dashboard');
+  }
+
+  document.getElementById('loginBtn').addEventListener('click', function(){
+    var pw = document.getElementById('loginPassword').value;
+    if(pw === window.APP.data.password){
+      sessionStorage.setItem('tucheng-admin-auth', '1');
+      showApp();
+    } else {
+      document.getElementById('loginError').textContent = '密碼錯誤,請再試一次';
+    }
+  });
+  document.getElementById('loginPassword').addEventListener('keydown', function(e){
+    if(e.key === 'Enter') document.getElementById('loginBtn').click();
+  });
+  document.getElementById('logoutBtn').addEventListener('click', function(){
+    sessionStorage.removeItem('tucheng-admin-auth');
+    location.reload();
+  });
+
+  if(sessionStorage.getItem('tucheng-admin-auth') === '1'){
+    showApp();
+  }
+
+  /* ---------- Mobile sidebar ---------- */
+  document.getElementById('hamburgerBtn').addEventListener('click', function(){
+    document.getElementById('sidebar').classList.add('mobile-open');
+    document.getElementById('sidebarOverlay').classList.add('active');
+  });
+  document.getElementById('sidebarOverlay').addEventListener('click', closeMobileSidebar);
+  function closeMobileSidebar(){
+    document.getElementById('sidebar').classList.remove('mobile-open');
+    document.getElementById('sidebarOverlay').classList.remove('active');
+  }
+  window.APP.closeMobileSidebar = closeMobileSidebar;
+
+  /* ---------- Navigation ---------- */
+  var navItems = document.querySelectorAll('.nav-item[data-page]');
+  navItems.forEach(function(item){
+    item.addEventListener('click', function(){
+      window.APP.navigate(item.getAttribute('data-page'));
+    });
+  });
+
+  window.APP.navigate = function(pageId){
+    navItems.forEach(function(item){
+      item.classList.toggle('active', item.getAttribute('data-page') === pageId);
+    });
+    var pages = document.querySelectorAll('.page');
+    pages.forEach(function(p){ p.classList.toggle('active', p.id === 'page-' + pageId); });
+    closeMobileSidebar();
+    if(window.APP.onNavigate) window.APP.onNavigate(pageId);
+    window.scrollTo(0,0);
+  };
+
+})();
+</script>
+<script>
+/* ============ CSV helpers ============ */
+(function(){
+  function csvEscape(val){
+    val = (val === undefined || val === null) ? '' : String(val);
+    if(/[",\n]/.test(val)) return '"' + val.replace(/"/g,'""') + '"';
+    return val;
+  }
+  window.APP.toCsv = function(headers, rows){
+    var lines = [headers.map(csvEscape).join(',')];
+    rows.forEach(function(r){ lines.push(r.map(csvEscape).join(',')); });
+    return '\uFEFF' + lines.join('\r\n');
+  };
+  window.APP.downloadText = function(text, filename, mime){
+    var blob = new Blob([text], {type: mime || 'text/csv;charset=utf-8'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+  window.APP.parseCsv = function(text){
+    text = text.replace(/^\uFEFF/, '');
+    var rows = [];
+    var row = []; var field = ''; var inQuotes = false;
+    for(var i=0;i<text.length;i++){
+      var c = text[i];
+      if(inQuotes){
+        if(c === '"'){
+          if(text[i+1] === '"'){ field += '"'; i++; }
+          else { inQuotes = false; }
+        } else { field += c; }
+      } else {
+        if(c === '"'){ inQuotes = true; }
+        else if(c === ','){ row.push(field); field = ''; }
+        else if(c === '\n'){ row.push(field); rows.push(row); row = []; field = ''; }
+        else if(c === '\r'){ /* skip */ }
+        else { field += c; }
+      }
+    }
+    if(field.length > 0 || row.length > 0){ row.push(field); rows.push(row); }
+    rows = rows.filter(function(r){ return r.length > 1 || (r.length === 1 && r[0].trim() !== ''); });
+    if(rows.length === 0) return {headers:[], data:[]};
+    var headers = rows[0].map(function(h){ return h.trim(); });
+    var data = rows.slice(1).map(function(r){
+      var obj = {};
+      headers.forEach(function(h, idx){ obj[h] = (r[idx] !== undefined) ? r[idx].trim() : ''; });
+      return obj;
+    });
+    return {headers:headers, data:data};
+  };
+})();
+
+/* ============ Students module ============ */
+(function(){
+  function render(){
+    var students = window.APP.data.students;
+    var tbody = document.querySelector('#studentsTable tbody');
+    document.getElementById('studentsEmpty').style.display = students.length ? 'none' : 'block';
+    tbody.innerHTML = students.map(function(s){
+      return '<tr>' +
+        '<td>' + s.name + '</td>' +
+        '<td>' + s.studentNo + '</td>' +
+        '<td>' + (s.school||'') + '</td>' +
+        '<td><button class="btn btn-sm editStudentBtn" data-id="' + s.id + '">編輯</button> ' +
+        '<button class="btn btn-sm btn-danger deleteStudentBtn" data-id="' + s.id + '">刪除</button></td>' +
+        '</tr>';
+    }).join('');
+    tbody.querySelectorAll('.editStudentBtn').forEach(function(b){ b.addEventListener('click', function(){ openStudentModal(b.getAttribute('data-id')); }); });
+    tbody.querySelectorAll('.deleteStudentBtn').forEach(function(b){ b.addEventListener('click', function(){ deleteStudent(b.getAttribute('data-id')); }); });
+    window.APP.refreshSharedDropdowns && window.APP.refreshSharedDropdowns();
+  }
+
+  function deleteStudent(id){
+    if(!confirm('確定要刪除這位學生嗎?(不會刪除已存在的簽到紀錄)')) return;
+    window.APP.data.students = window.APP.data.students.filter(function(s){ return s.id !== id; });
+    window.APP.saveData();
+    render();
+    window.APP.toast('已刪除學生');
+  }
+
+  function openStudentModal(id){
+    var s = id ? window.APP.data.students.find(function(x){ return x.id === id; }) : null;
+    var name = prompt('姓名', s ? s.name : '');
+    if(name === null) return;
+    if(!name.trim()){ alert('姓名不可空白'); return; }
+    var studentNo = prompt('學號', s ? s.studentNo : '');
+    if(studentNo === null) return;
+    var school = prompt('學校', s ? s.school : '');
+    if(school === null) return;
+    if(s){
+      s.name = name.trim(); s.studentNo = studentNo.trim(); s.school = school.trim();
+    } else {
+      window.APP.data.students.push({id: window.APP.uuid(), name: name.trim(), studentNo: studentNo.trim(), school: school.trim()});
+    }
+    window.APP.saveData();
+    render();
+    window.APP.toast('已儲存學生資料');
+  }
+
+  document.getElementById('addStudentBtn').addEventListener('click', function(){ openStudentModal(null); });
+
+  document.getElementById('downloadStudentTemplateBtn').addEventListener('click', function(){
+    var csv = window.APP.toCsv(['姓名','學號','學校'], [['王小明','A001','長庚科技大學']]);
+    window.APP.downloadText(csv, '學生名單範本.csv');
+  });
+
+  document.getElementById('importStudentBtn').addEventListener('click', function(){
+    document.getElementById('studentFileInput').click();
+  });
+  document.getElementById('studentFileInput').addEventListener('change', function(e){
+    var file = e.target.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      var parsed = window.APP.parseCsv(ev.target.result);
+      var added = 0;
+      parsed.data.forEach(function(row){
+        var name = row['姓名'] || '';
+        var studentNo = row['學號'] || '';
+        var school = row['學校'] || '';
+        if(!name) return;
+        var exists = window.APP.data.students.find(function(s){ return s.studentNo === studentNo && studentNo !== ''; });
+        if(exists){
+          exists.name = name; exists.school = school;
+        } else {
+          window.APP.data.students.push({id: window.APP.uuid(), name: name, studentNo: studentNo, school: school});
+          added++;
+        }
+      });
+      window.APP.saveData();
+      render();
+      window.APP.toast('匯入完成,新增 ' + added + ' 筆學生');
+      e.target.value = '';
+    };
+    reader.readAsText(file, 'UTF-8');
+  });
+
+  window.APP.renderStudents = render;
+})();
+
+/* ============ Stations module ============ */
+(function(){
+  function render(){
+    var stations = window.APP.data.stations;
+    var tbody = document.querySelector('#stationsTable tbody');
+    document.getElementById('stationsEmpty').style.display = stations.length ? 'none' : 'block';
+    tbody.innerHTML = stations.map(function(s){
+      return '<tr><td>' + s.name + '</td>' +
+        '<td><button class="btn btn-sm btn-danger deleteStationBtn" data-id="' + s.id + '">刪除</button></td></tr>';
+    }).join('');
+    tbody.querySelectorAll('.deleteStationBtn').forEach(function(b){
+      b.addEventListener('click', function(){
+        if(!confirm('確定要刪除這個站別嗎?')) return;
+        window.APP.data.stations = window.APP.data.stations.filter(function(s){ return s.id !== b.getAttribute('data-id'); });
+        window.APP.saveData(); render();
+      });
+    });
+    window.APP.refreshSharedDropdowns && window.APP.refreshSharedDropdowns();
+  }
+
+  document.getElementById('addStationBtn').addEventListener('click', function(){
+    var name = prompt('站別名稱');
+    if(!name || !name.trim()) return;
+    window.APP.data.stations.push({id: window.APP.uuid(), name: name.trim()});
+    window.APP.saveData(); render();
+    window.APP.toast('已新增站別');
+  });
+
+  document.getElementById('downloadStationTemplateBtn').addEventListener('click', function(){
+    var csv = window.APP.toCsv(['站別名稱'], [['乳房攝影室']]);
+    window.APP.downloadText(csv, '站別清單範本.csv');
+  });
+
+  document.getElementById('importStationBtn').addEventListener('click', function(){
+    document.getElementById('stationFileInput').click();
+  });
+  document.getElementById('stationFileInput').addEventListener('change', function(e){
+    var file = e.target.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      var parsed = window.APP.parseCsv(ev.target.result);
+      var added = 0;
+      parsed.data.forEach(function(row){
+        var name = row['站別名稱'] || '';
+        if(!name) return;
+        var exists = window.APP.data.stations.find(function(s){ return s.name === name; });
+        if(!exists){
+          window.APP.data.stations.push({id: window.APP.uuid(), name: name});
+          added++;
+        }
+      });
+      window.APP.saveData(); render();
+      window.APP.toast('匯入完成,新增 ' + added + ' 個站別');
+      e.target.value = '';
+    };
+    reader.readAsText(file, 'UTF-8');
+  });
+
+  window.APP.renderStations = render;
+})();
+
+/* ============ Teachers module (with QR codes) ============ */
+(function(){
+  function checkinBaseUrl(){
+    var here = window.location.href.split('#')[0];
+    return here.replace(/admin\.html.*$/, 'checkin.html');
+  }
+
+  function render(){
+    var teachers = window.APP.data.teachers;
+    document.getElementById('checkinUrlNotice').textContent =
+      'QR Code 連結網址前綴:' + checkinBaseUrl() + '?teacher=...(部署後此網址會自動依您開啟 admin.html 的網域產生)';
+    var tbody = document.querySelector('#teachersTable tbody');
+    document.getElementById('teachersEmpty').style.display = teachers.length ? 'none' : 'block';
+    tbody.innerHTML = teachers.map(function(t){
+      return '<tr>' +
+        '<td>' + t.name + '</td>' +
+        '<td>' + (t.department||'') + '</td>' +
+        '<td>' + (t.primaryStation||'(未設定)') + '</td>' +
+        '<td><div class="qr-holder" data-id="' + t.id + '" style="width:84px;"></div></td>' +
+        '<td>' +
+        '<button class="btn btn-sm editTeacherBtn" data-id="' + t.id + '">編輯</button> ' +
+        '<button class="btn btn-sm downloadQrBtn" data-id="' + t.id + '">下載 QR</button> ' +
+        '<button class="btn btn-sm btn-danger deleteTeacherBtn" data-id="' + t.id + '">刪除</button>' +
+        '</td></tr>';
+    }).join('');
+
+    teachers.forEach(function(t){
+      var holder = tbody.querySelector('.qr-holder[data-id="' + t.id + '"]');
+      if(holder && window.QRCode){
+        holder.innerHTML = '';
+        new QRCode(holder, {text: checkinBaseUrl() + '?teacher=' + t.id, width:84, height:84, colorDark:'#295247', colorLight:'#ffffff'});
+      }
+    });
+
+    tbody.querySelectorAll('.editTeacherBtn').forEach(function(b){ b.addEventListener('click', function(){ openTeacherModal(b.getAttribute('data-id')); }); });
+    tbody.querySelectorAll('.deleteTeacherBtn').forEach(function(b){
+      b.addEventListener('click', function(){
+        if(!confirm('確定要刪除這位老師嗎?已產生的 QR Code 將失效。')) return;
+        window.APP.data.teachers = window.APP.data.teachers.filter(function(t){ return t.id !== b.getAttribute('data-id'); });
+        window.APP.saveData(); render();
+      });
+    });
+    tbody.querySelectorAll('.downloadQrBtn').forEach(function(b){
+      b.addEventListener('click', function(){ downloadSingleQr(b.getAttribute('data-id')); });
+    });
+
+    window.APP.refreshSharedDropdowns && window.APP.refreshSharedDropdowns();
+  }
+
+  function openTeacherModal(id){
+    var t = id ? window.APP.data.teachers.find(function(x){ return x.id === id; }) : null;
+    var name = prompt('老師姓名', t ? t.name : '');
+    if(name === null) return;
+    if(!name.trim()){ alert('姓名不可空白'); return; }
+    var department = prompt('科別', t ? t.department : '');
+    if(department === null) return;
+    var stationNames = window.APP.data.stations.map(function(s){ return s.name; }).join('、');
+    var primaryStation = prompt('主要站別(選填,可留空;目前已建立站別:' + stationNames + ')', t ? (t.primaryStation||'') : '');
+    if(primaryStation === null) return;
+    if(t){
+      t.name = name.trim(); t.department = department.trim(); t.primaryStation = primaryStation.trim();
+    } else {
+      window.APP.data.teachers.push({id: window.APP.uuid(), name: name.trim(), department: department.trim(), primaryStation: primaryStation.trim()});
+    }
+    window.APP.saveData();
+    render();
+    window.APP.toast('已儲存老師資料');
+  }
+
+  function makeQrDataUrl(teacherId, cb){
+    var temp = document.createElement('div');
+    new QRCode(temp, {text: checkinBaseUrl() + '?teacher=' + teacherId, width:300, height:300, colorDark:'#295247', colorLight:'#ffffff'});
+    setTimeout(function(){
+      var canvas = temp.querySelector('canvas');
+      var img = temp.querySelector('img');
+      if(canvas){ cb(canvas.toDataURL('image/png')); }
+      else if(img){ cb(img.src); }
+    }, 60);
+  }
+
+  function downloadSingleQr(id){
+    var t = window.APP.data.teachers.find(function(x){ return x.id === id; });
+    if(!t) return;
+    makeQrDataUrl(id, function(dataUrl){
+      var a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = t.name + '_QRCode.png';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    });
+  }
+
+  document.getElementById('addTeacherBtn').addEventListener('click', function(){ openTeacherModal(null); });
+
+  document.getElementById('downloadTeacherTemplateBtn').addEventListener('click', function(){
+    var csv = window.APP.toCsv(['姓名','科別','主要站別'], [['陳醫師','放射科','乳房攝影室']]);
+    window.APP.downloadText(csv, '老師名單範本.csv');
+  });
+
+  document.getElementById('importTeacherBtn').addEventListener('click', function(){
+    document.getElementById('teacherFileInput').click();
+  });
+  document.getElementById('teacherFileInput').addEventListener('change', function(e){
+    var file = e.target.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      var parsed = window.APP.parseCsv(ev.target.result);
+      var added = 0;
+      parsed.data.forEach(function(row){
+        var name = row['姓名'] || '';
+        if(!name) return;
+        var exists = window.APP.data.teachers.find(function(t){ return t.name === name; });
+        if(exists){
+          exists.department = row['科別'] || exists.department;
+          exists.primaryStation = row['主要站別'] || exists.primaryStation;
+        } else {
+          window.APP.data.teachers.push({id: window.APP.uuid(), name: name, department: row['科別']||'', primaryStation: row['主要站別']||''});
+          added++;
+        }
+      });
+      window.APP.saveData(); render();
+      window.APP.toast('匯入完成,新增 ' + added + ' 位老師');
+      e.target.value = '';
+    };
+    reader.readAsText(file, 'UTF-8');
+  });
+
+  document.getElementById('downloadAllQrBtn').addEventListener('click', function(){
+    var teachers = window.APP.data.teachers;
+    if(teachers.length === 0){ alert('尚未建立任何老師資料'); return; }
+    var zip = new JSZip();
+    var done = 0;
+    teachers.forEach(function(t){
+      makeQrDataUrl(t.id, function(dataUrl){
+        var base64 = dataUrl.split(',')[1];
+        zip.file(t.name + '_QRCode.png', base64, {base64:true});
+        done++;
+        if(done === teachers.length){
+          zip.generateAsync({type:'blob'}).then(function(blob){
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = '老師QRCode_全部.zip';
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          });
+        }
+      });
+    });
+  });
+
+  window.APP.renderTeachers = render;
+})();
+</script>
+<script>
+/* ============ Shared dropdown refresh (students used across pages) ============ */
+window.APP.refreshSharedDropdowns = function(){
+  var students = window.APP.data.students;
+  var selects = document.querySelectorAll('#recordFilterStudent');
+  selects.forEach(function(sel){
+    var current = sel.value;
+    sel.innerHTML = '<option value="">全部</option>' + students.map(function(s){
+      return '<option value="' + s.id + '">' + s.name + '</option>';
+    }).join('');
+    sel.value = current;
+  });
+};
+
+/* ============ Schedule module ============ */
+(function(){
+  function studentName(id){
+    var s = window.APP.data.students.find(function(x){ return x.id === id; });
+    return s ? s.name : '(已刪除學生)';
+  }
+
+  function render(){
+    document.getElementById('scheduleStartDateLabel').textContent = window.APP.data.settings.internshipStartDate || '—';
+    document.getElementById('scheduleTotalWeeksLabel').textContent = window.APP.data.settings.totalWeeks || '—';
+
+    var schedule = window.APP.data.schedule.slice().sort(function(a,b){
+      if(a.week !== b.week) return a.week - b.week;
+      return studentName(a.studentId).localeCompare(studentName(b.studentId));
+    });
+    var tbody = document.querySelector('#scheduleTable tbody');
+    document.getElementById('scheduleEmpty').style.display = schedule.length ? 'none' : 'block';
+    tbody.innerHTML = schedule.map(function(s){
+      return '<tr>' +
+        '<td>第' + s.week + '週</td>' +
+        '<td>' + s.startDate + '</td>' +
+        '<td>' + s.endDate + '</td>' +
+        '<td>' + studentName(s.studentId) + '</td>' +
+        '<td>' + s.station + '</td>' +
+        '<td><button class="btn btn-sm btn-danger deleteScheduleBtn" data-id="' + s.id + '">刪除</button></td>' +
+        '</tr>';
+    }).join('');
+    tbody.querySelectorAll('.deleteScheduleBtn').forEach(function(b){
+      b.addEventListener('click', function(){
+        if(!confirm('確定要刪除這筆排程嗎?')) return;
+        window.APP.data.schedule = window.APP.data.schedule.filter(function(s){ return s.id !== b.getAttribute('data-id'); });
+        window.APP.saveData(); render();
+      });
+    });
+  }
+
+  function openScheduleModal(){
+    var students = window.APP.data.students;
+    var stations = window.APP.data.stations;
+    if(students.length === 0){ alert('請先建立學生資料'); return; }
+    if(stations.length === 0){ alert('請先建立站別資料'); return; }
+    var week = prompt('週次(數字)');
+    if(week === null || !week.trim()) return;
+    var startDate = prompt('開始日期(格式 YYYY-MM-DD)');
+    if(startDate === null || !startDate.trim()) return;
+    var endDate = prompt('結束日期(格式 YYYY-MM-DD)');
+    if(endDate === null || !endDate.trim()) return;
+    var studentNames = students.map(function(s){ return s.name; }).join('、');
+    var studentNameInput = prompt('學生姓名(現有學生:' + studentNames + ')');
+    if(studentNameInput === null || !studentNameInput.trim()) return;
+    var student = students.find(function(s){ return s.name === studentNameInput.trim(); });
+    if(!student){ alert('找不到此學生,請確認姓名是否正確'); return; }
+    var stationNames = stations.map(function(s){ return s.name; }).join('、');
+    var station = prompt('應到站別(現有站別:' + stationNames + ')');
+    if(station === null || !station.trim()) return;
+
+    window.APP.data.schedule.push({
+      id: window.APP.uuid(), week: parseInt(week,10) || 0,
+      startDate: startDate.trim(), endDate: endDate.trim(),
+      studentId: student.id, station: station.trim()
+    });
+    window.APP.saveData();
+    render();
+    window.APP.toast('已新增排程');
+  }
+
+  document.getElementById('addScheduleBtn').addEventListener('click', openScheduleModal);
+
+  document.getElementById('downloadScheduleTemplateBtn').addEventListener('click', function(){
+    var csv = window.APP.toCsv(['週次','開始日期','結束日期','學生姓名','學號','應到站別'],
+      [['1','2026-07-06','2026-07-12','王小明','A001','乳房攝影室']]);
+    window.APP.downloadText(csv, '排程表範本.csv');
+  });
+
+  document.getElementById('importScheduleBtn').addEventListener('click', function(){
+    document.getElementById('scheduleFileInput').click();
+  });
+  document.getElementById('scheduleFileInput').addEventListener('change', function(e){
+    var file = e.target.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      var parsed = window.APP.parseCsv(ev.target.result);
+      var added = 0, skipped = 0;
+      parsed.data.forEach(function(row){
+        var studentNo = row['學號'] || '';
+        var studentNameVal = row['學生姓名'] || '';
+        var student = window.APP.data.students.find(function(s){
+          return (studentNo && s.studentNo === studentNo) || (s.name === studentNameVal);
+        });
+        if(!student || !row['週次']){ skipped++; return; }
+        window.APP.data.schedule.push({
+          id: window.APP.uuid(),
+          week: parseInt(row['週次'],10) || 0,
+          startDate: row['開始日期'] || '',
+          endDate: row['結束日期'] || '',
+          studentId: student.id,
+          station: row['應到站別'] || ''
+        });
+        added++;
+      });
+      window.APP.saveData(); render();
+      window.APP.toast('匯入完成,新增 ' + added + ' 筆排程' + (skipped ? ',略過 ' + skipped + ' 筆(找不到對應學生)' : ''));
+      e.target.value = '';
+    };
+    reader.readAsText(file, 'UTF-8');
+  });
+
+  window.APP.renderSchedule = render;
+})();
+
+/* ============ Records module ============ */
+(function(){
+  function studentName(id){
+    var s = window.APP.data.students.find(function(x){ return x.id === id; });
+    return s ? s.name : '(已刪除學生)';
+  }
+
+  function isMismatch(r){
+    var teacher = window.APP.data.teachers.find(function(t){ return t.id === r.teacherId; });
+    if(!teacher || !teacher.primaryStation || !r.station) return false;
+    return teacher.primaryStation !== r.station;
+  }
+  window.APP.isMismatch = isMismatch;
+
+  function render(){
+    var records = window.APP.data.records.slice().sort(function(a,b){ return b.timestamp - a.timestamp; });
+
+    var filterStudent = document.getElementById('recordFilterStudent').value;
+    var filterStart = document.getElementById('recordFilterStart').value;
+    var filterEnd = document.getElementById('recordFilterEnd').value;
+    var filterMismatch = document.getElementById('recordFilterMismatch').value;
+
+    var filtered = records.filter(function(r){
+      if(filterStudent && r.studentId !== filterStudent) return false;
+      if(filterStart && r.date < filterStart) return false;
+      if(filterEnd && r.date > filterEnd) return false;
+      if(filterMismatch === '1' && !isMismatch(r)) return false;
+      return true;
+    });
+
+    var tbody = document.querySelector('#recordsTable tbody');
+    document.getElementById('recordsEmpty').style.display = filtered.length ? 'none' : 'block';
+    tbody.innerHTML = filtered.map(function(r){
+      var mismatch = isMismatch(r);
+      var stationCell = r.station || '(未設定排程)';
+      if(mismatch){
+        stationCell = '<span class="tag warn">' + stationCell + ' · 待確認</span>';
+      }
+      return '<tr>' +
+        '<td>' + r.date + '</td>' +
+        '<td>' + (r.studentName || studentName(r.studentId)) + '</td>' +
+        '<td>' + stationCell + '</td>' +
+        '<td>' + r.teacherName + '</td>' +
+        '<td><span class="tag ' + (r.type === 'checkin' ? 'checkin' : 'checkout') + '">' + (r.type === 'checkin' ? '簽到' : '簽退') + '</span></td>' +
+        '<td>' + r.time + '</td>' +
+        '<td>' + (r.note || '') + '</td>' +
+        '<td><button class="btn btn-sm editRecordBtn" data-id="' + r.id + '">編輯</button> ' +
+        '<button class="btn btn-sm btn-danger deleteRecordBtn" data-id="' + r.id + '">刪除</button></td>' +
+        '</tr>';
+    }).join('');
+
+    tbody.querySelectorAll('.editRecordBtn').forEach(function(b){ b.addEventListener('click', function(){ openRecordModal(b.getAttribute('data-id')); }); });
+    tbody.querySelectorAll('.deleteRecordBtn').forEach(function(b){
+      b.addEventListener('click', function(){
+        if(!confirm('確定要刪除這筆紀錄嗎?')) return;
+        window.APP.data.records = window.APP.data.records.filter(function(r){ return r.id !== b.getAttribute('data-id'); });
+        window.APP.saveData(); render();
+        window.APP.refreshDashboard && window.APP.refreshDashboard();
+      });
+    });
+  }
+
+  function openRecordModal(id){
+    var r = id ? window.APP.data.records.find(function(x){ return x.id === id; }) : null;
+    var students = window.APP.data.students;
+    var teachers = window.APP.data.teachers;
+    if(!r && (students.length === 0)){ alert('請先建立學生資料'); return; }
+
+    var studentNameVal = prompt('學生姓名', r ? r.studentName : (students[0] ? students[0].name : ''));
+    if(studentNameVal === null) return;
+    var student = students.find(function(s){ return s.name === studentNameVal.trim(); });
+    if(!student){ alert('找不到此學生'); return; }
+
+    var teacherNameVal = prompt('老師姓名', r ? r.teacherName : '');
+    if(teacherNameVal === null) return;
+    var teacher = teachers.find(function(t){ return t.name === teacherNameVal.trim(); });
+
+    var date = prompt('日期(YYYY-MM-DD)', r ? r.date : window.APP.formatDate(new Date()));
+    if(date === null) return;
+    var time = prompt('時間(HH:MM)', r ? r.time : '08:00');
+    if(time === null) return;
+    var station = prompt('站別', r ? r.station : '');
+    if(station === null) return;
+    var type = prompt('類型(輸入 checkin 表示簽到,checkout 表示簽退)', r ? r.type : 'checkin');
+    if(type === null) return;
+    var note = prompt('備註(選填)', r ? (r.note||'') : '');
+    if(note === null) return;
+
+    var dt = new Date(date + 'T' + time + ':00');
+
+    if(r){
+      r.studentId = student.id; r.studentName = student.name;
+      r.teacherId = teacher ? teacher.id : r.teacherId;
+      r.teacherName = teacherNameVal.trim();
+      r.date = date.trim(); r.time = time.trim(); r.station = station.trim();
+      r.type = (type.trim() === 'checkout') ? 'checkout' : 'checkin';
+      r.note = note.trim();
+      r.timestamp = dt.getTime() || r.timestamp;
+    } else {
+      window.APP.data.records.push({
+        id: window.APP.uuid(), studentId: student.id, studentName: student.name,
+        teacherId: teacher ? teacher.id : '', teacherName: teacherNameVal.trim(),
+        date: date.trim(), time: time.trim(), station: station.trim(),
+        type: (type.trim() === 'checkout') ? 'checkout' : 'checkin',
+        note: note.trim(), timestamp: dt.getTime() || Date.now()
+      });
+    }
+    window.APP.saveData();
+    render();
+    window.APP.refreshDashboard && window.APP.refreshDashboard();
+    window.APP.toast('已儲存紀錄');
+  }
+
+  document.getElementById('addRecordBtn').addEventListener('click', function(){ openRecordModal(null); });
+
+  document.getElementById('recordFilterStudent').addEventListener('change', render);
+  document.getElementById('recordFilterStart').addEventListener('change', render);
+  document.getElementById('recordFilterEnd').addEventListener('change', render);
+  document.getElementById('recordFilterMismatch').addEventListener('change', render);
+
+  document.getElementById('importStudentJsonBtn').addEventListener('click', function(){
+    document.getElementById('studentJsonFileInput').click();
+  });
+  document.getElementById('studentJsonFileInput').addEventListener('change', function(e){
+    var file = e.target.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      try{
+        var json = JSON.parse(ev.target.result);
+        var incoming = json.records || [];
+        var existingIds = {};
+        window.APP.data.records.forEach(function(r){ existingIds[r.id] = true; });
+        var added = 0;
+        incoming.forEach(function(r){
+          if(existingIds[r.id]) return;
+          window.APP.data.records.push(r);
+          added++;
+        });
+        window.APP.saveData();
+        render();
+        window.APP.refreshDashboard && window.APP.refreshDashboard();
+        window.APP.toast('匯入完成,新增 ' + added + ' 筆紀錄');
+      }catch(err){
+        alert('匯入失敗,檔案格式不正確');
+      }
+      e.target.value = '';
+    };
+    reader.readAsText(file, 'UTF-8');
+  });
+
+  window.APP.renderRecords = render;
+})();
+
+/* ============ Leaves module ============ */
+(function(){
+  var LEAVE_TYPES = ['病假','事假','公假','曠職','生理假','喪假','婚假','其他'];
+
+  function studentName(id){
+    var s = window.APP.data.students.find(function(x){ return x.id === id; });
+    return s ? s.name : '(已刪除學生)';
+  }
+
+  function render(){
+    var leaves = window.APP.data.leaves.slice().sort(function(a,b){ return b.date.localeCompare(a.date); });
+    var tbody = document.querySelector('#leavesTable tbody');
+    document.getElementById('leavesEmpty').style.display = leaves.length ? 'none' : 'block';
+    tbody.innerHTML = leaves.map(function(l){
+      return '<tr>' +
+        '<td>' + l.date + '</td>' +
+        '<td>' + studentName(l.studentId) + '</td>' +
+        '<td><span class="tag leave">' + l.type + '</span></td>' +
+        '<td>' + (l.note||'') + '</td>' +
+        '<td><button class="btn btn-sm btn-danger deleteLeaveBtn" data-id="' + l.id + '">刪除</button></td>' +
+        '</tr>';
+    }).join('');
+    tbody.querySelectorAll('.deleteLeaveBtn').forEach(function(b){
+      b.addEventListener('click', function(){
+        if(!confirm('確定要刪除這筆請假紀錄嗎?')) return;
+        window.APP.data.leaves = window.APP.data.leaves.filter(function(l){ return l.id !== b.getAttribute('data-id'); });
+        window.APP.saveData(); render();
+        window.APP.refreshDashboard && window.APP.refreshDashboard();
+      });
+    });
+  }
+
+  document.getElementById('addLeaveBtn').addEventListener('click', function(){
+    var students = window.APP.data.students;
+    if(students.length === 0){ alert('請先建立學生資料'); return; }
+    var studentNameVal = prompt('學生姓名(現有學生:' + students.map(function(s){return s.name;}).join('、') + ')');
+    if(studentNameVal === null || !studentNameVal.trim()) return;
+    var student = students.find(function(s){ return s.name === studentNameVal.trim(); });
+    if(!student){ alert('找不到此學生'); return; }
+    var date = prompt('請假日期(YYYY-MM-DD)');
+    if(date === null || !date.trim()) return;
+    var type = prompt('假別(' + LEAVE_TYPES.join('、') + ')');
+    if(type === null || !type.trim()) return;
+    var note = prompt('備註(選填)');
+    if(note === null) note = '';
+    window.APP.data.leaves.push({id: window.APP.uuid(), studentId: student.id, date: date.trim(), type: type.trim(), note: note.trim()});
+    window.APP.saveData();
+    render();
+    window.APP.refreshDashboard && window.APP.refreshDashboard();
+    window.APP.toast('已新增請假紀錄');
+  });
+
+  window.APP.renderLeaves = render;
+  window.APP.LEAVE_TYPES = LEAVE_TYPES;
+})();
+</script>
+<script>
+/* ============ Settings module ============ */
+(function(){
+  function render(){
+    document.getElementById('settingStartDate').value = window.APP.data.settings.internshipStartDate || '';
+    document.getElementById('settingTotalWeeks').value = window.APP.data.settings.totalWeeks || 28;
+    document.getElementById('settingThreshold').value = window.APP.data.settings.duplicateThresholdMinutes;
+  }
+
+  document.getElementById('saveSettingsBtn').addEventListener('click', function(){
+    window.APP.data.settings.internshipStartDate = document.getElementById('settingStartDate').value;
+    window.APP.data.settings.totalWeeks = parseInt(document.getElementById('settingTotalWeeks').value,10) || 28;
+    window.APP.saveData();
+    window.APP.renderSchedule && window.APP.renderSchedule();
+    window.APP.populateWeekSelectors && window.APP.populateWeekSelectors();
+    window.APP.toast('設定已儲存');
+  });
+
+  document.getElementById('savePasswordBtn').addEventListener('click', function(){
+    var pw = document.getElementById('settingNewPassword').value;
+    if(!pw.trim()){ alert('請輸入新密碼'); return; }
+    window.APP.data.password = pw.trim();
+    window.APP.saveData();
+    document.getElementById('settingNewPassword').value = '';
+    window.APP.toast('密碼已更新');
+  });
+
+  window.APP.renderSettings = render;
+})();
+
+/* ============ Sync module ============ */
+(function(){
+  document.getElementById('exportAdminJsonBtn').addEventListener('click', function(){
+    var payload = JSON.parse(JSON.stringify(window.APP.data));
+    var now = new Date();
+    var fname = '管理系統備份_' + window.APP.formatDate(now) + '_' + window.APP.pad(now.getHours()) + window.APP.pad(now.getMinutes()) + '.json';
+    window.APP.downloadText(JSON.stringify(payload, null, 2), fname, 'application/json');
+  });
+
+  document.getElementById('importAdminJsonBtn').addEventListener('click', function(){
+    document.getElementById('adminJsonFileInput').click();
+  });
+  document.getElementById('adminJsonFileInput').addEventListener('change', function(e){
+    var file = e.target.files[0];
+    if(!file) return;
+    if(!confirm('匯入後將會用此檔案的內容,覆蓋目前系統上所有資料,確定要繼續嗎?')) { e.target.value=''; return; }
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      try{
+        var json = JSON.parse(ev.target.result);
+        window.APP.data = json;
+        window.APP.saveData();
+        window.APP.renderAll && window.APP.renderAll();
+        window.APP.toast('資料已同步匯入');
+      }catch(err){
+        alert('匯入失敗,檔案格式不正確');
+      }
+      e.target.value = '';
+    };
+    reader.readAsText(file, 'UTF-8');
+  });
+
+  document.getElementById('exportDataJsonBtn').addEventListener('click', function(){
+    var d = window.APP.data;
+    var payload = {
+      hospitalName: '土城醫院醫事放射',
+      teachers: d.teachers.map(function(t){ return {id:t.id, name:t.name, department:t.department, primaryStation:t.primaryStation}; }),
+      students: d.students.map(function(s){ return {id:s.id, name:s.name, studentNo:s.studentNo, school:s.school}; }),
+      stations: d.stations.map(function(s){ return {name:s.name}; }),
+      schedule: d.schedule.map(function(s){ return {week:s.week, startDate:s.startDate, endDate:s.endDate, studentId:s.studentId, station:s.station}; }),
+      settings: {
+        duplicateThresholdMinutes: d.settings.duplicateThresholdMinutes,
+        internshipStartDate: d.settings.internshipStartDate,
+        totalWeeks: d.settings.totalWeeks
+      }
+    };
+    window.APP.downloadText(JSON.stringify(payload, null, 2), 'data.json', 'application/json');
+    window.APP.toast('已匯出 data.json,請上傳取代 GitHub 上的同名檔案');
+  });
+})();
+
+/* ============ Dashboard module ============ */
+(function(){
+  function weekRangeLabel(){
+    var start = window.APP.data.settings.internshipStartDate;
+    var totalWeeks = window.APP.data.settings.totalWeeks;
+    return start ? ('實習自 ' + start + ' 起算,共 ' + totalWeeks + ' 週') : '尚未設定實習開始日期(請至系統設定)';
+  }
+
+  function getWeekNumber(dateStr){
+    var start = window.APP.data.settings.internshipStartDate;
+    if(!start) return null;
+    var startDt = new Date(start + 'T00:00:00');
+    var d = new Date(dateStr + 'T00:00:00');
+    var diffDays = Math.floor((d - startDt) / 86400000);
+    if(diffDays < 0) return null;
+    return Math.floor(diffDays / 7) + 1;
+  }
+  window.APP.getWeekNumber = getWeekNumber;
+
+  function thisWeekRange(){
+    var start = window.APP.data.settings.internshipStartDate;
+    if(!start) return null;
+    var startDt = new Date(start + 'T00:00:00');
+    var now = new Date();
+    var diffDays = Math.floor((now - startDt) / 86400000);
+    var weekIdx = Math.floor(diffDays / 7);
+    if(weekIdx < 0) weekIdx = 0;
+    var weekStart = new Date(startDt.getTime() + weekIdx*7*86400000);
+    var weekEnd = new Date(weekStart.getTime() + 6*86400000);
+    return {start: window.APP.formatDate(weekStart), end: window.APP.formatDate(weekEnd), weekNo: weekIdx+1};
+  }
+
+  function render(){
+    document.getElementById('dashSub').textContent = weekRangeLabel();
+    document.getElementById('metricStudents').textContent = window.APP.data.students.length;
+
+    var range = thisWeekRange();
+    var records = window.APP.data.records;
+    var leaves = window.APP.data.leaves;
+
+    var attendDates = {};
+    var mismatchCount = 0;
+    records.forEach(function(r){
+      if(range && r.date >= range.start && r.date <= range.end){
+        attendDates[r.studentId + '_' + r.date] = true;
+      }
+      if(window.APP.isMismatch(r)) mismatchCount++;
+    });
+    document.getElementById('metricAttend').textContent = Object.keys(attendDates).length;
+
+    var leaveCount = 0;
+    leaves.forEach(function(l){
+      if(range && l.date >= range.start && l.date <= range.end) leaveCount++;
+    });
+    document.getElementById('metricLeave').textContent = leaveCount;
+    document.getElementById('metricMismatch').textContent = mismatchCount;
+
+    var recent = records.slice().sort(function(a,b){ return b.timestamp - a.timestamp; }).slice(0, 10);
+    var tbody = document.querySelector('#dashRecentTable tbody');
+    tbody.innerHTML = recent.map(function(r){
+      return '<tr><td>' + r.date + '</td><td>' + r.studentName + '</td><td>' + (r.station||'-') + '</td><td>' + r.teacherName + '</td>' +
+        '<td><span class="tag ' + (r.type==='checkin'?'checkin':'checkout') + '">' + (r.type==='checkin'?'簽到':'簽退') + '</span></td><td>' + r.time + '</td></tr>';
+    }).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--ink-faint);padding:20px;">尚無紀錄</td></tr>';
+  }
+
+  window.APP.refreshDashboard = render;
+})();
+
+/* ============ Reports module ============ */
+(function(){
+  function studentName(id){
+    var s = window.APP.data.students.find(function(x){ return x.id === id; });
+    return s ? s.name : '(已刪除學生)';
+  }
+  function studentSchool(id){
+    var s = window.APP.data.students.find(function(x){ return x.id === id; });
+    return s ? (s.school||'') : '';
+  }
+
+  function leaveLookup(studentId, date){
+    var l = window.APP.data.leaves.find(function(x){ return x.studentId === studentId && x.date === date; });
+    return l ? l.type : '';
+  }
+
+  function buildDailyRows(startDate, endDate){
+    var records = window.APP.data.records.filter(function(r){ return r.date >= startDate && r.date <= endDate; });
+    var groups = {};
+    records.forEach(function(r){
+      var key = r.studentId + '_' + r.date + '_' + (r.station || '');
+      if(!groups[key]) groups[key] = {date:r.date, studentId:r.studentId, station:r.station, checkin:'', checkout:''};
+      if(r.type === 'checkin'){ if(!groups[key].checkin || r.time < groups[key].checkin) groups[key].checkin = r.time; }
+      else { if(!groups[key].checkout || r.time > groups[key].checkout) groups[key].checkout = r.time; }
+    });
+    var rows = Object.keys(groups).map(function(k){ return groups[k]; });
+    rows.sort(function(a,b){ return a.date === b.date ? studentName(a.studentId).localeCompare(studentName(b.studentId)) : a.date.localeCompare(b.date); });
+
+    var leaves = window.APP.data.leaves.filter(function(l){ return l.date >= startDate && l.date <= endDate; });
+    leaves.forEach(function(l){
+      rows.push({date:l.date, studentId:l.studentId, station:'', checkin:'', checkout:'', leaveType:l.type});
+    });
+    rows.sort(function(a,b){ return a.date.localeCompare(b.date); });
+    return rows;
+  }
+
+  function buildWeeklyRows(startWeek, endWeek){
+    var schedule = window.APP.data.schedule;
+    var students = window.APP.data.students;
+    var rows = [];
+    students.forEach(function(stu){
+      for(var w = startWeek; w <= endWeek; w++){
+        var entries = schedule.filter(function(s){ return s.studentId === stu.id && s.week === w; });
+        if(entries.length === 0) continue;
+        var startD = entries.reduce(function(a,b){ return a.startDate < b.startDate ? a : b; }).startDate;
+        var endD = entries.reduce(function(a,b){ return a.endDate > b.endDate ? a : b; }).endDate;
+        var stations = entries.map(function(e){ return e.station; });
+        var records = window.APP.data.records.filter(function(r){ return r.studentId === stu.id && r.date >= startD && r.date <= endD && r.type === 'checkin'; });
+        var attendDays = {};
+        records.forEach(function(r){ attendDays[r.date] = true; });
+        var leaves = window.APP.data.leaves.filter(function(l){ return l.studentId === stu.id && l.date >= startD && l.date <= endD; });
+        rows.push({
+          week: w, startDate: startD, endDate: endD, studentId: stu.id,
+          stations: stations, attendDays: Object.keys(attendDays).length,
+          leaveDays: leaves.length, leaveTypes: leaves.map(function(l){return l.type;}).join('、')
+        });
+      }
+    });
+    return rows;
+  }
+
+  function renderDailyPreview(startDate, endDate){
+    var rows = buildDailyRows(startDate, endDate);
+    var html = '<div class="card" id="dailyPrintCard"><h3 style="margin-bottom:14px;">逐日明細報表(' + startDate + ' ~ ' + endDate + ')</h3>' +
+      '<div class="table-wrap"><table><thead><tr><th>日期</th><th>學生</th><th>學校</th><th>站別</th><th>簽到</th><th>簽退</th><th>假別</th></tr></thead><tbody>';
+    rows.forEach(function(r){
+      html += '<tr><td>' + r.date + '</td><td>' + studentName(r.studentId) + '</td><td>' + studentSchool(r.studentId) + '</td>' +
+        '<td>' + (r.station||'') + '</td><td>' + (r.checkin||'') + '</td><td>' + (r.checkout||'') + '</td><td>' + (r.leaveType||'') + '</td></tr>';
+    });
+    html += '</tbody></table></div></div>';
+    document.getElementById('printPreviewArea').innerHTML = html;
+    return rows;
+  }
+
+  function renderWeeklyPreview(startWeek, endWeek){
+    var rows = buildWeeklyRows(startWeek, endWeek);
+    var html = '<div class="card" id="weeklyPrintCard"><h3 style="margin-bottom:14px;">週次彙整報表(第' + startWeek + '週 ~ 第' + endWeek + '週)</h3>' +
+      '<div class="table-wrap"><table><thead><tr><th>週次</th><th>日期區間</th><th>學生</th><th>學校</th><th>站別</th><th>出席天數</th><th>請假天數</th><th>假別</th></tr></thead><tbody>';
+    rows.forEach(function(r){
+      html += '<tr><td>第' + r.week + '週</td><td>' + r.startDate + ' ~ ' + r.endDate + '</td><td>' + studentName(r.studentId) + '</td>' +
+        '<td>' + studentSchool(r.studentId) + '</td><td>' + r.stations.join('、') + '</td><td>' + r.attendDays + '</td><td>' + r.leaveDays + '</td><td>' + (r.leaveTypes||'') + '</td></tr>';
+    });
+    html += '</tbody></table></div></div>';
+    document.getElementById('printPreviewArea').innerHTML = html;
+    return rows;
+  }
+
+  document.getElementById('dailyReportExcelBtn').addEventListener('click', function(){
+    var startDate = document.getElementById('dailyReportStart').value;
+    var endDate = document.getElementById('dailyReportEnd').value;
+    if(!startDate || !endDate){ alert('請選擇日期區間'); return; }
+    var rows = buildDailyRows(startDate, endDate);
+    var data = [['日期','學生姓名','學校','站別','簽到時間','簽退時間','假別']];
+    rows.forEach(function(r){
+      data.push([r.date, studentName(r.studentId), studentSchool(r.studentId), r.station||'', r.checkin||'', r.checkout||'', r.leaveType||'']);
+    });
+    var ws = XLSX.utils.aoa_to_sheet(data);
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, '逐日明細');
+    XLSX.writeFile(wb, '逐日明細報表_' + startDate + '_' + endDate + '.xlsx');
+  });
+
+  document.getElementById('dailyReportPdfBtn').addEventListener('click', function(){
+    var startDate = document.getElementById('dailyReportStart').value;
+    var endDate = document.getElementById('dailyReportEnd').value;
+    if(!startDate || !endDate){ alert('請選擇日期區間'); return; }
+    renderDailyPreview(startDate, endDate);
+    setTimeout(function(){ window.print(); }, 200);
+  });
+
+  document.getElementById('weeklyReportExcelBtn').addEventListener('click', function(){
+    var sw = parseInt(document.getElementById('weeklyReportStart').value,10);
+    var ew = parseInt(document.getElementById('weeklyReportEnd').value,10);
+    if(!sw || !ew){ alert('請選擇週次區間'); return; }
+    var rows = buildWeeklyRows(sw, ew);
+    var data = [['週次','開始日期','結束日期','學生姓名','學校','站別','出席天數','請假天數','假別']];
+    rows.forEach(function(r){
+      data.push(['第'+r.week+'週', r.startDate, r.endDate, studentName(r.studentId), studentSchool(r.studentId), r.stations.join('、'), r.attendDays, r.leaveDays, r.leaveTypes||'']);
+    });
+    var ws = XLSX.utils.aoa_to_sheet(data);
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, '週次彙整');
+    XLSX.writeFile(wb, '週次彙整報表_第' + sw + '至' + ew + '週.xlsx');
+  });
+
+  document.getElementById('weeklyReportPdfBtn').addEventListener('click', function(){
+    var sw = parseInt(document.getElementById('weeklyReportStart').value,10);
+    var ew = parseInt(document.getElementById('weeklyReportEnd').value,10);
+    if(!sw || !ew){ alert('請選擇週次區間'); return; }
+    renderWeeklyPreview(sw, ew);
+    setTimeout(function(){ window.print(); }, 200);
+  });
+
+  window.APP.populateWeekSelectors = function(){
+    var totalWeeks = window.APP.data.settings.totalWeeks || 28;
+    var startSel = document.getElementById('weeklyReportStart');
+    var endSel = document.getElementById('weeklyReportEnd');
+    var opts = '';
+    for(var w=1; w<=totalWeeks; w++){ opts += '<option value="' + w + '">第' + w + '週</option>'; }
+    startSel.innerHTML = opts;
+    endSel.innerHTML = opts;
+    endSel.value = totalWeeks;
+  };
+})();
+
+/* ============ App init / render all ============ */
+(function(){
+  window.APP.renderAll = function(){
+    window.APP.renderStudents && window.APP.renderStudents();
+    window.APP.renderTeachers && window.APP.renderTeachers();
+    window.APP.renderStations && window.APP.renderStations();
+    window.APP.renderSchedule && window.APP.renderSchedule();
+    window.APP.renderRecords && window.APP.renderRecords();
+    window.APP.renderLeaves && window.APP.renderLeaves();
+    window.APP.renderSettings && window.APP.renderSettings();
+    window.APP.refreshDashboard && window.APP.refreshDashboard();
+    window.APP.populateWeekSelectors && window.APP.populateWeekSelectors();
+  };
+
+  window.APP.onNavigate = function(pageId){
+    if(pageId === 'dashboard') window.APP.refreshDashboard && window.APP.refreshDashboard();
+    if(pageId === 'students') window.APP.renderStudents && window.APP.renderStudents();
+    if(pageId === 'teachers') window.APP.renderTeachers && window.APP.renderTeachers();
+    if(pageId === 'stations') window.APP.renderStations && window.APP.renderStations();
+    if(pageId === 'schedule') window.APP.renderSchedule && window.APP.renderSchedule();
+    if(pageId === 'records') window.APP.renderRecords && window.APP.renderRecords();
+    if(pageId === 'leaves') window.APP.renderLeaves && window.APP.renderLeaves();
+    if(pageId === 'settings') window.APP.renderSettings && window.APP.renderSettings();
+    if(pageId === 'reports') window.APP.populateWeekSelectors && window.APP.populateWeekSelectors();
+  };
+
+  var origNavigate = window.APP.navigate;
+  document.addEventListener('DOMContentLoaded', function(){
+    window.APP.renderAll();
+  });
+  if(document.readyState !== 'loading'){
+    window.APP.renderAll();
+  }
+})();
+</script>
+
+</body>
+</html>

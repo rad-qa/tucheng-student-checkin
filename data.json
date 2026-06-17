@@ -1,0 +1,28 @@
+{
+  "hospitalName": "土城醫院醫事放射",
+  "teachers": [
+    { "id": "T001", "name": "陳醫師", "department": "放射科", "primaryStation": "乳房攝影室" },
+    { "id": "T002", "name": "林醫師", "department": "放射科", "primaryStation": "電腦斷層室" },
+    { "id": "T003", "name": "張醫師", "department": "放射科", "primaryStation": "血管攝影室" }
+  ],
+  "students": [
+    { "id": "A001", "name": "王小明", "school": "長庚科技大學" }
+  ],
+  "stations": [
+    { "name": "乳房攝影室" },
+    { "name": "電腦斷層室" },
+    { "name": "血管攝影室" },
+    { "name": "一般X光室" },
+    { "name": "超音波室" }
+  ],
+  "schedule": [
+    { "week": 1, "startDate": "2026-07-06", "endDate": "2026-07-12", "studentId": "A001", "station": "乳房攝影室" },
+    { "week": 2, "startDate": "2026-07-13", "endDate": "2026-07-19", "studentId": "A001", "station": "電腦斷層室" },
+    { "week": 3, "startDate": "2026-07-20", "endDate": "2026-07-26", "studentId": "A001", "station": "血管攝影室" }
+  ],
+  "settings": {
+    "duplicateThresholdMinutes": 2,
+    "internshipStartDate": "2026-07-06",
+    "totalWeeks": 28
+  }
+}
