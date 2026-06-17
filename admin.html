@@ -1242,29 +1242,42 @@ window.APP.refreshSharedDropdowns = function(){
     });
   }
 
+  function isValidDateStr(s){
+    return /^\d{4}-\d{2}-\d{2}$/.test(s);
+  }
+
   function openScheduleModal(){
     var students = window.APP.data.students;
     var stations = window.APP.data.stations;
     if(students.length === 0){ alert('請先建立學生資料'); return; }
-    if(stations.length === 0){ alert('請先建立站別資料'); return; }
+
     var week = prompt('週次(數字)');
     if(week === null || !week.trim()) return;
-    var startDate = prompt('開始日期(格式 YYYY-MM-DD)');
+
+    var todayStr = window.APP.formatDate(new Date());
+    var startDate = prompt('開始日期(格式 YYYY-MM-DD,例如 ' + todayStr + ')', todayStr);
     if(startDate === null || !startDate.trim()) return;
-    var endDate = prompt('結束日期(格式 YYYY-MM-DD)');
+    startDate = startDate.trim();
+    if(!isValidDateStr(startDate)){ alert('日期格式不正確,請使用 YYYY-MM-DD 格式(例如 ' + todayStr + '),不要用 2026/6/17 這種斜線格式'); return; }
+
+    var endDate = prompt('結束日期(格式 YYYY-MM-DD,例如 ' + todayStr + ')', startDate);
     if(endDate === null || !endDate.trim()) return;
+    endDate = endDate.trim();
+    if(!isValidDateStr(endDate)){ alert('日期格式不正確,請使用 YYYY-MM-DD 格式(例如 ' + todayStr + '),不要用 2026/6/17 這種斜線格式'); return; }
+
     var studentNames = students.map(function(s){ return s.name; }).join('、');
     var studentNameInput = prompt('學生姓名(現有學生:' + studentNames + ')');
     if(studentNameInput === null || !studentNameInput.trim()) return;
     var student = students.find(function(s){ return s.name === studentNameInput.trim(); });
     if(!student){ alert('找不到此學生,請確認姓名是否正確'); return; }
-    var stationNames = stations.map(function(s){ return s.name; }).join('、');
-    var station = prompt('應到站別(現有站別:' + stationNames + ')');
+
+    var stationHint = stations.length ? ('現有站別:' + stations.map(function(s){ return s.name; }).join('、')) : '尚未建立站別清單,可直接輸入站別名稱文字';
+    var station = prompt('應到站別(' + stationHint + ')');
     if(station === null || !station.trim()) return;
 
     window.APP.data.schedule.push({
       id: window.APP.uuid(), week: parseInt(week,10) || 0,
-      startDate: startDate.trim(), endDate: endDate.trim(),
+      startDate: startDate, endDate: endDate,
       studentId: student.id, station: station.trim()
     });
     window.APP.saveData();
@@ -1279,6 +1292,18 @@ window.APP.refreshSharedDropdowns = function(){
       [['1','2026-07-06','2026-07-12','王小明','A001','乳房攝影室']]);
     window.APP.downloadText(csv, '排程表範本.csv');
   });
+
+  function normalizeDateStr(s){
+    s = (s || '').trim();
+    if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+    // handle Excel-style 2026/6/17 or 2026/06/17 -> 2026-06-17
+    var m = s.match(/^(\d{4})[\/\.](\d{1,2})[\/\.](\d{1,2})$/);
+    if(m){
+      return m[1] + '-' + (m[2].length===1?'0'+m[2]:m[2]) + '-' + (m[3].length===1?'0'+m[3]:m[3]);
+    }
+    return s;
+  }
+  window.APP.normalizeDateStr = normalizeDateStr;
 
   document.getElementById('importScheduleBtn').addEventListener('click', function(){
     document.getElementById('scheduleFileInput').click();
@@ -1300,8 +1325,8 @@ window.APP.refreshSharedDropdowns = function(){
         window.APP.data.schedule.push({
           id: window.APP.uuid(),
           week: parseInt(row['週次'],10) || 0,
-          startDate: row['開始日期'] || '',
-          endDate: row['結束日期'] || '',
+          startDate: normalizeDateStr(row['開始日期']),
+          endDate: normalizeDateStr(row['結束日期']),
           studentId: student.id,
           station: row['應到站別'] || ''
         });
