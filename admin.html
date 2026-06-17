@@ -1317,10 +1317,22 @@ window.APP.refreshSharedDropdowns = function(){
     return s ? s.name : '(已刪除學生)';
   }
 
+  function findCurrentScheduleStation(studentId, dateStr){
+    var schedule = window.APP.data.schedule;
+    for(var i=0;i<schedule.length;i++){
+      var s = schedule[i];
+      if(s.studentId === studentId && dateStr >= s.startDate && dateStr <= s.endDate){
+        return s.station;
+      }
+    }
+    return null;
+  }
+
   function isMismatch(r){
-    var teacher = window.APP.data.teachers.find(function(t){ return t.id === r.teacherId; });
-    if(!teacher || !teacher.primaryStation || !r.station) return false;
-    return teacher.primaryStation !== r.station;
+    if(!r.station) return false;
+    var scheduledStation = findCurrentScheduleStation(r.studentId, r.date);
+    if(scheduledStation === null || scheduledStation === '') return false;
+    return scheduledStation !== r.station;
   }
   window.APP.isMismatch = isMismatch;
 
