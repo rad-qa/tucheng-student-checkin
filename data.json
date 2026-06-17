@@ -26,10 +26,17 @@
   "schedule": [
     {
       "week": 1,
-      "startDate": "2026/7/6",
-      "endDate": "2026/7/12",
+      "startDate": "2026/6/15",
+      "endDate": "2026/6/17",
       "studentId": "x1781680624030-6uh190",
       "station": "R1"
+    },
+    {
+      "week": 1,
+      "startDate": "2026/6/18",
+      "endDate": "2026/6/19",
+      "studentId": "x1781680624030-6uh190",
+      "station": "R2"
     }
   ],
   "settings": {
